@@ -1,7 +1,15 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<?php foreach( $settings as $key => $rows ) : ?>
-<div class="glsr-nav-view-section" id="<?= $key; ?>" style="margin-top:40px;">
-	<?php do_action( 'site-reviews/addon/settings/'.$key, $rows ); ?>
-</div>
+<?php if (count($settings) > 1) : ?>
+    <ul class="glsr-subsubsub subsubsub">
+        <?php foreach ($settings as $key => $rows) : ?>
+            <li><a href="#addons_<?= $key; ?>" tabindex="0"><?= ucfirst($key); ?></a><span>|</span></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+
+<?php foreach ($settings as $key => $rows) : ?>
+    <div class="glsr-nav-view-section" id="<?= $key; ?>">
+        <?php glsr()->action('addon/settings/'.$key, $rows); ?>
+    </div>
 <?php endforeach; ?>

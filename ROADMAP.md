@@ -4,33 +4,44 @@ All proposed features are subject to change and are sorted alphabetically rather
 
 ## Proposed features
 
-- [ ] Integrate with WordPress GDPR controls
-- [ ] Protect review metadata from Custom Fields on other post_types
+- [ ] Add "More Details" modal to addons (ref: Plugins > Add New)
+- [ ] Add a setting to send an email notification after responding to a review
+- [ ] Add a single-use notice on the settings page to encourage users to rate the plugin (ref: Polylang)
+- [ ] Add a time constraint to review limits
+- [ ] Add Initial REST API support for querying reviews
+- [ ] Add Elementor blocks
+- [ ] restrict displayed reviews by empty content (setting only?)
+- [ ] Allow review submissions without javascript (ref: comment form)
+- [ ] Integrate with Antispam Bee (https://wordpress.org/plugins/antispam-bee/)
+- [ ] Integrate with hCaptcha
+- [ ] Integrate with reCAPTCHA v3 (ref: Contact Form 7)
+- [ ] Restrict reviews in the admin to those assigned to pages of the current user
 - [ ] Review statistics
 - [ ] Store the review GEO location by IP
-- [ ] Throttle anonymous review submissions
-- [ ] WP REST API support
+- [ ] Version rollback (ref: WP Rocket)
+- [ ] View all reviews by author
 
 ## Upcoming Add-ons
 
-- [x] 1. Review Images
-- [x] 2. Tripadvisor Reviews
-- [ ] 3. Review Themes (customization of stars (star, thumb, emote, percent), fonts, colors, etc.)
-- [ ] 4. Multi-Ratings (for rating individual services of a business)
-- [ ] 5. Social reviews (share review links)
-- [ ] Booking.com Reviews
-- [ ] Edit authored reviews
-- [ ] Etsy Reviews
-- [ ] Facebook Reviews
-- [ ] Flag reviews
-- [ ] Form Builder (add/remove/drag-drop to order)
-- [ ] Google Reviews
-- [ ] Importer (from 3rd-party WordPress review plugins)
-- [ ] Questions and Answers
-- [ ] Review Builder (add/remove/drag-drop to order)
-- [ ] Review Form Builder
+### Functionality
+
+- [ ] Review Authors (allow people to update their submitted reviews)
+- [ ] Review Importer (from 3rd-party WordPress review plugins)
+- [ ] Review Snitch (flag reviews as inappropriate)
+- [ ] Review Summaries (single positive/negative ratings, summary styles, etc.)
+- [x] Review Themes
 - [ ] Review Threads
 - [ ] Review Upvotes
-- [ ] Summary filters (clickable summary bars for filtering)
-- [ ] WooCommerce (incl. review reminders, verified reviews)
+- [ ] Review Sharing
+- [ ] Questions and Answers
+
+### Integrations
+
+- [ ] Booking.com Reviews
+- [ ] Etsy Reviews
+- [ ] Facebook Reviews
+- [ ] Google Reviews
+- [x] Tripadvisor Reviews (done, but needs an additional service to make it work consistantly)
+- [ ] Trustpilot Reviews
 - [ ] Yelp Reviews
+

@@ -2,43 +2,77 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Html;
 
-use GeminiLabs\SiteReviews\Helper;
-use GeminiLabs\SiteReviews\Modules\Html\Field;
-use GeminiLabs\SiteReviews\Modules\Html\Template;
-use GeminiLabs\SiteReviews\Modules\Session;
+use GeminiLabs\SiteReviews\Helpers\Arr;
 
-class Form
+class Form extends \ArrayObject
 {
-	/**
-	 * @param string $id
-	 * @return string
-	 */
-	public function buildFields( $id )
-	{
-		return array_reduce( $this->getFields( $id ), function( $carry, $field ) {
-			return $carry.$field;
-		});
-	}
+    /**
+     * @var array
+     */
+    protected $fields;
 
-	/**
-	 * @param string $id
-	 * @return array
-	 */
-	public function getFields( $id )
-	{
-		$fields = [];
-		foreach( glsr()->config( 'forms/'.$id ) as $name => $field ) {
-			$fields[] = new Field( wp_parse_args( $field, ['name' => $name] ));
-		}
-		return $fields;
-	}
+    /**
+     * @var array
+     */
+    protected $hidden;
 
-	/**
-	 * @param string $id
-	 * @return void
-	 */
-	public function renderFields( $id )
-	{
-		echo $this->buildFields( $id );
-	}
+    /**
+     * @var array
+     */
+    protected $visible;
+
+    public function __construct(array $visible, array $hidden = [])
+    {
+        $this->fields = array_merge($hidden, $visible);
+        $this->hidden = $hidden;
+        $this->visible = $visible;
+        parent::__construct($this->fields, \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        if (method_exists($this, $method)) {
+            return call_user_func_array([$this, $method], $args);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return array_reduce($this->getArrayCopy(), function ($carry, $field) {
+            return $carry.$field;
+        });
+    }
+
+    /**
+     * @return \GeminiLabs\SiteReviews\Modules\Html\Field|array|null
+     */
+    public function hidden($key = null)
+    {
+        return is_null($key) ? $this->hidden : Arr::get($this->hidden, $key, null);
+    }
+
+    /**
+     * @param mixed $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        if (array_key_exists($key, $this->fields)) {
+            return $this->fields[$key];
+        }
+    }
+
+    /**
+     * @return \GeminiLabs\SiteReviews\Modules\Html\Field|array|null
+     */
+    public function visible($key = null)
+    {
+        return is_null($key) ? $this->visible : Arr::get($this->visible, $key, null);
+    }
 }

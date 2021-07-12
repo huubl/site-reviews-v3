@@ -2,28 +2,50 @@
 // Partials -> WP List Table
 // =============================================================================
 
+[class*=post-type-site-review] .row-actions .id > span {
+    color: #999;
+}
+
+#wpbody-content .inline-edit-row .glsr-inline-edit-col-right {
+	margin-top: calc(30px + .2em);
+}
+#wpbody-content .inline-edit-row .glsr-inline-edit-col-left,
+#wpbody-content .inline-edit-row .glsr-inline-edit-col-right {
+	width: 50%;
+	textarea {
+		height: 8em;
+	}
+	@media screen and (max-width: 782px) {
+		float: none;
+		margin-top: 0;
+		width: 100%;
+	}
+}
+
+
+.glsr-responsive-table {
+	position: relative;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	width: 100%;
+	td {
+		white-space: nowrap;
+	}
+}
+
 .glsr-metabox-table .star-rating .star,
-.column-rating .star-rating .star {
+.post-type-site-review .star-rating .star {
 	width: 16px;
 	font-size: 16px;
 	line-height: 20px;
 	color: #555;
 }
-.column-rating .star-rating .star {
+.post-type-site-review .star-rating .star {
 	margin-top: -2px;
 }
 
 
-
-
-
-
-
-
-
-
-
-.hide-column-tog + .pinned-icon + svg {
+.post-type-site-review .hide-column-tog + .pinned-icon + svg {
 	display: none;
 }
 
@@ -58,15 +80,22 @@
 		width: 100px;
 	}
 
-	td.column-pinned {
+	td.column-is_pinned {
+		i.pin-review {
+			align-items: center;
+			cursor: pointer;
+			display: flex;
+			float: none;
+			justify-content: center;
+			margin: 0;
+			transition: none;
+		}
 		i {
 			line-height: 24px;
 			text-indent: -3px;
-			cursor: pointer;
 		}
 
 		i:not(.pinned) {
-			// color: #eaeaea;
 			color: rgba(85,85,85,0.2);
 		}
 	}
@@ -119,14 +148,21 @@
 			box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.07);
 		}
 
-		th.column-reviewer,
+		th.column-assigned_posts,
+		th.column-assigned_users,
+		th.column-ip_address {
+			white-space: nowrap;
+		}
+
+		th.column-name,
 		th.column-taxonomy-site-review-category,
-		th.column-assigned_to,
-		th.column-review_type {
+		th.column-assigned_posts,
+		th.column-assigned_users,
+		th.column-type {
 			width: 120px;
 		}
 
-		th.column-pinned {
+		th.column-is_pinned {
 			width: 45px;
 
 			// span.sorting-indicator,
@@ -141,7 +177,6 @@
 				line-height: 22px;
 				font-size: 16px;
 				text-align: center;
-				transition: color .1s ease-in 0;
 			}
 
 			.sorting-indicator {
@@ -149,7 +184,7 @@
 			}
 		}
 
-		td.column-pinned {
+		td.column-is_pinned {
 			padding: 8px 6px;
 
 			i {

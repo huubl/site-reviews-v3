@@ -1,11 +1,9 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<div class="glsr-field wpforms-field wpforms-field-checkbox {{ class }}">
-	<ul>
-		<li>
-			{{ field }}
-			{{ label }}
-		</li>
-	</ul>
-	{{ errors }}
+<div class="wpforms-field-checkbox {{ class }}">
+    {{ label }}
+    <ul>
+        {{ field }}
+    </ul>
+    {{ errors }}
 </div>

@@ -2,42 +2,45 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Html\Fields;
 
-use GeminiLabs\SiteReviews\Modules\Html\Fields\Field;
+use GeminiLabs\SiteReviews\Helpers\Arr;
 
 class YesNo extends Field
 {
-	/**
-	 * @return string|void
-	 */
-	public function build()
-	{
-		$this->builder->tag = 'input';
-		$this->mergeFieldArgs();
-		return $this->builder->getTag();
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function defaults($fieldLocation = null)
+    {
+        $classes = [
+            'metabox' => '',
+            'setting' => 'inline',
+            'widget' => 'inline',
+        ];
+        return [
+            'class' => Arr::get($classes, $fieldLocation),
+        ];
+    }
 
-	/**
-	 * @return array
-	 */
-	public static function defaults()
-	{
-		return [
-			'class' => 'inline',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function required($fieldLocation = null)
+    {
+        return [
+            'is_multi' => true,
+            'options' => [
+                'no' => __('No', 'site-reviews'),
+                'yes' => __('Yes', 'site-reviews'),
+            ],
+            'type' => 'radio',
+        ];
+    }
 
-	/**
-	 * @return array
-	 */
-	public static function required()
-	{
-		return [
-			'is_multi' => true,
-			'options' => [
-				'no' => __( 'No', 'site-reviews' ),
-				'yes' => __( 'Yes', 'site-reviews' ),
-			],
-			'type' => 'radio',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function tag()
+    {
+        return 'input';
+    }
 }

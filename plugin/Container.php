@@ -4,204 +4,305 @@ namespace GeminiLabs\SiteReviews;
 
 use Closure;
 use Exception;
+use GeminiLabs\SiteReviews\Exceptions\BindingResolutionException;
+use GeminiLabs\SiteReviews\Helpers\Arr;
+use GeminiLabs\SiteReviews\Helpers\Str;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 
 abstract class Container
 {
-	const PROTECTED_PROPERTIES = [
-		'instance',
-		'services',
-		'storage',
-	];
+    /**
+     * @var array
+     */
+    protected $bindings = [];
 
-	/**
-	 * @var static
-	 */
-	protected static $instance;
+    /**
+     * @var array
+     */
+    protected $buildStack = [];
 
-	/**
-	 * The container's bound services
-	 * @var array
-	 */
-	protected $services = [];
+    /**
+     * @var array
+     */
+    protected $instances = [];
 
-	/**
-	 * The container's storage items
-	 * @var array
-	 */
-	protected $storage = [];
+    /**
+     * @var array[]
+     */
+    protected $with = [];
 
-	/**
-	 * @return static
-	 */
-	public static function load()
-	{
-		if( empty( static::$instance )) {
-			static::$instance = new static;
-		}
-		return static::$instance;
-	}
+    /**
+     * @param string $alias
+     * @param mixed $concrete
+     * @return void
+     */
+    public function alias($alias, $concrete)
+    {
+        $this->instances[$alias] = $concrete;
+    }
 
-	/**
-	 * @param string $property
-	 * @return mixed
-	 */
-	public function __get( $property )
-	{
-		if( property_exists( $this, $property ) && !in_array( $property, static::PROTECTED_PROPERTIES )) {
-			return $this->$property;
-		}
-		$constant = 'static::'.strtoupper( $this->make( Helper::class )->snakeCase( $property ));
-		if( defined( $constant )) {
-			return constant( $constant );
-		}
-		return isset( $this->storage[$property] )
-			? $this->storage[$property]
-			: null;
-	}
+    /**
+     * @param string $abstract
+     * @param mixed $concrete
+     * @param bool $shared
+     * @return void
+     */
+    public function bind($abstract, $concrete = null, $shared = false)
+    {
+        $this->dropStaleInstances($abstract);
+        $concrete = Helper::ifTrue(is_null($concrete), $abstract, $concrete);
+        if (!$concrete instanceof Closure) {
+            $concrete = $this->getClosure($abstract, $concrete);
+        }
+        $this->bindings[$abstract] = compact('concrete', 'shared');
+    }
 
-	/**
-	 * @param string $property
-	 * @param string $value
-	 * @return void
-	 */
-	public function __set( $property, $value )
-	{
-		if( !property_exists( $this, $property ) || in_array( $property, static::PROTECTED_PROPERTIES )) {
-			$this->storage[$property] = $value;
-		}
-		else if( !isset( $this->$property )) {
-			$this->$property = $value;
-		}
-		else {
-			throw new Exception( sprintf( 'The "%s" property cannot be changed once set.', $property ));
-		}
-	}
+    /**
+     * @param mixed $abstract
+     * @return mixed
+     */
+    public function make($abstract, array $parameters = [])
+    {
+        if (is_string($abstract) && !class_exists($abstract)) {
+            $alias = __NAMESPACE__.'\\'.Str::removePrefix($abstract, __NAMESPACE__);
+            $abstract = Helper::ifTrue(class_exists($alias), $alias, $abstract);
+        }
+        return $this->resolve($abstract, $parameters);
+    }
 
-	/**
-	 * Bind a service to the container
-	 * @param string $alias
-	 * @param mixed $concrete
-	 * @return mixed
-	 */
-	public function bind( $alias, $concrete )
-	{
-		$this->services[$alias] = $concrete;
-	}
+    /**
+     * @param string $abstract
+     * @param mixed $concrete
+     * @return void
+     */
+    public function singleton($abstract, $concrete = null)
+    {
+        $this->bind($abstract, $concrete, true);
+    }
 
-	/**
-	 * Request a service from the container
-	 * @param mixed $abstract
-	 * @return mixed
-	 */
-	public function make( $abstract )
-	{
-		if( !isset( $this->services[$abstract] )) {
-			$abstract = $this->addNamespace( $abstract );
-		}
-		if( isset( $this->services[$abstract] )) {
-			$abstract = $this->services[$abstract];
-		}
-		if( is_callable( $abstract )) {
-			return call_user_func_array( $abstract, [$this] );
-		}
-		if( is_object( $abstract )) {
-			return $abstract;
-		}
-		return $this->resolve( $abstract );
-	}
+    /**
+     * @param Closure|string $concrete
+     * @return mixed
+     * @throws BindingResolutionException
+     */
+    protected function construct($concrete)
+    {
+        if ($concrete instanceof Closure) {
+            return $concrete($this, $this->getLastParameterOverride()); // probably a bound closure
+        }
+        try {
+            $reflector = new ReflectionClass($concrete); // class or classname provided
+        } catch (ReflectionException $e) {
+            throw new BindingResolutionException("Target class [$concrete] does not exist.", 0, $e);
+        }
+        if (!$reflector->isInstantiable()) {
+            $this->throwNotInstantiable($concrete); // not an instantiable class
+        }
+        $this->buildStack[] = $concrete;
+        if (is_null($constructor = $reflector->getConstructor())) {
+            array_pop($this->buildStack);
+            return new $concrete(); // class has no __construct
+        }
+        try {
+            $instances = $this->resolveDependencies($constructor->getParameters()); // resolve class dependencies
+        } catch (BindingResolutionException $e) {
+            array_pop($this->buildStack);
+            throw $e;
+        }
+        array_pop($this->buildStack);
+        return $reflector->newInstanceArgs($instances); // return a new class
+    }
 
-	/**
-     * Bind a singleton instance to the container
-	 * @param string $alias
-	 * @param callable|string|null $binding
-	 * @return void
-	 */
-	public function singleton( $alias, $binding )
-	{
-		$this->bind( $alias, $this->make( $binding ));
-	}
+    /**
+     * @param string $abstract
+     * @return void
+     */
+    protected function dropStaleInstances($abstract)
+    {
+        unset($this->instances[$abstract]);
+    }
 
-	/**
-	 * Prefix the current namespace to the abstract if absent
-	 * @param string $abstract
-	 * @return string
-	 */
-	protected function addNamespace( $abstract )
-	{
-		if( strpos( $abstract, __NAMESPACE__ ) === false && !class_exists( $abstract )) {
-			$abstract = __NAMESPACE__.'\\'.$abstract;
-		}
-		return $abstract;
-	}
+    /**
+     * @param \ReflectionParameter $parameter
+     * @return null|\ReflectionClass|\ReflectionNamedType|\ReflectionType
+     */
+    protected function getClass($parameter)
+    {
+        if (version_compare(phpversion(), '8', '<')) {
+            return $parameter->getClass(); // @compat PHP < 8
+        }
+        return $parameter->getType();
+    }
 
-	/**
-	 * Resolve a service from the container
-	 * @param mixed $concrete
-	 * @return mixed
-	 * @throws Exception
-	 */
-	protected function resolve( $concrete )
-	{
-		if( $concrete instanceof Closure ) {
-			return $concrete( $this );
-		}
-		$reflector = new ReflectionClass( $concrete );
-		if( !$reflector->isInstantiable() ) {
-			throw new Exception( 'Target ['.$concrete.'] is not instantiable.' );
-		}
-		$constructor = $reflector->getConstructor();
-		if( empty( $constructor )) {
-			return new $concrete;
-		}
-		return $reflector->newInstanceArgs(
-			$this->resolveDependencies( $constructor->getParameters() )
-		);
-	}
+    /**
+     * @param string $abstract
+     * @param string $concrete
+     * @return Closure
+     */
+    protected function getClosure($abstract, $concrete)
+    {
+        return function ($container, $parameters = []) use ($abstract, $concrete) {
+            return $abstract == $concrete
+                ? $container->construct($concrete)
+                : $container->resolve($concrete, $parameters);
+        };
+    }
 
-	/**
-	 * Resolve a class based dependency from the container
-	 * @return mixed
-	 * @throws Exception
-	 */
-	protected function resolveClass( ReflectionParameter $parameter )
-	{
-		try {
-			return $this->make( $parameter->getClass()->name );
-		}
-		catch( Exception $error ) {
-			if( $parameter->isOptional() ) {
-				return $parameter->getDefaultValue();
-			}
-			throw $error;
-		}
-	}
+    /**
+     * @param string $abstract
+     * @return mixed
+     */
+    protected function getConcrete($abstract)
+    {
+        if (isset($this->bindings[$abstract])) {
+            return $this->bindings[$abstract]['concrete'];
+        }
+        return $abstract;
+    }
 
-	/**
-	 * Resolve all of the dependencies from the ReflectionParameters
-	 * @return array
-	 */
-	protected function resolveDependencies( array $dependencies )
-	{
-		$results = [];
-		foreach( $dependencies as $dependency ) {
-			$results[] = !is_null( $class = $dependency->getClass() )
-				? $this->resolveClass( $dependency )
-				: $this->resolveDependency( $dependency );
-		}
-		return $results;
-	}
+    /**
+     * @return array
+     */
+    protected function getLastParameterOverride()
+    {
+        return Arr::consolidate(end($this->with));
+    }
 
-	/**
-	 * Resolve a single ReflectionParameter dependency
-	 * @return array|null
-	 */
-	protected function resolveDependency( ReflectionParameter $parameter )
-	{
-		if( $parameter->isArray() && $parameter->isDefaultValueAvailable() ) {
-			return $parameter->getDefaultValue();
-		}
-		return null;
-	}
+    /**
+     * @param ReflectionParameter $dependency
+     * @return mixed
+     */
+    protected function getParameterOverride($dependency)
+    {
+        return $this->getLastParameterOverride()[$dependency->name];
+    }
+
+    /**
+     * @param ReflectionParameter $dependency
+     * @return bool
+     */
+    protected function hasParameterOverride($dependency)
+    {
+        return array_key_exists($dependency->name, $this->getLastParameterOverride());
+    }
+
+    /**
+     * @param mixed $concrete
+     * @param string $abstract
+     * @return bool
+     */
+    protected function isBuildable($concrete, $abstract)
+    {
+        return $concrete === $abstract || $concrete instanceof Closure;
+    }
+
+    /**
+     * @param string $abstract
+     * @return bool
+     */
+    protected function isShared($abstract)
+    {
+        return isset($this->instances[$abstract]) || !empty($this->bindings[$abstract]['shared']);
+    }
+
+    /**
+     * @param mixed $abstract
+     * @param array $parameters
+     * @return mixed
+     * @throws BindingResolutionException
+     */
+    protected function resolve($abstract, $parameters = [])
+    {
+        if (isset($this->instances[$abstract]) && empty($parameters)) {
+            return $this->instances[$abstract]; // return an existing singleton
+        }
+        $this->with[] = $parameters;
+        $concrete = $this->getConcrete($abstract);
+        $object = Helper::ifTrue($this->isBuildable($concrete, $abstract),
+            function () use ($concrete) { return $this->construct($concrete); },
+            function () use ($concrete) { return $this->make($concrete); }
+        );
+        if ($this->isShared($abstract) && empty($parameters)) {
+            $this->instances[$abstract] = $object; // store as a singleton
+        }
+        array_pop($this->with);
+        return $object;
+    }
+
+    /**
+     * Resolve a class based dependency from the container.
+     * @return mixed
+     * @throws Exception
+     */
+    protected function resolveClass(ReflectionParameter $parameter)
+    {
+        try {
+            return $this->make($this->getClass($parameter)->getName());
+        } catch (Exception $error) {
+            if ($parameter->isOptional()) {
+                return $parameter->getDefaultValue();
+            }
+            throw $error;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function resolveDependencies(array $dependencies)
+    {
+        $results = [];
+        foreach ($dependencies as $dependency) {
+            if ($this->hasParameterOverride($dependency)) {
+                $results[] = $this->getParameterOverride($dependency);
+                continue;
+            }
+            $results[] = Helper::ifTrue(is_null($this->getClass($dependency)),
+                function () use ($dependency) { return $this->resolvePrimitive($dependency); },
+                function () use ($dependency) { return $this->resolveClass($dependency); }
+            );
+        }
+        return $results;
+    }
+
+    /**
+     * @param ReflectionParameter $parameter
+     * @return mixed
+     * @throws BindingResolutionException
+     */
+    protected function resolvePrimitive(ReflectionParameter $parameter)
+    {
+        if ($parameter->isDefaultValueAvailable()) {
+            return $parameter->getDefaultValue();
+        }
+        $this->throwUnresolvablePrimitive($parameter);
+    }
+
+    /**
+     * @param string $concrete
+     * @return void
+     * @throws BindingResolutionException
+     */
+    protected function throwNotInstantiable($concrete)
+    {
+        if (empty($this->buildStack)) {
+            $message = "Target [$concrete] is not instantiable.";
+        } else {
+            $previous = implode(', ', $this->buildStack);
+            $message = "Target [$concrete] is not instantiable while building [$previous].";
+        }
+        throw new BindingResolutionException($message);
+    }
+
+    /**
+     * @param ReflectionParameter $parameter
+     * @return void
+     * @throws BindingResolutionException
+     */
+    protected function throwUnresolvablePrimitive(ReflectionParameter $parameter)
+    {
+        throw new BindingResolutionException("Unresolvable dependency resolving [$parameter] in class {$parameter->getDeclaringClass()->getName()}");
+    }
 }

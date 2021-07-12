@@ -1,31 +1,46 @@
 {
-  "private": true,
   "dependencies": {
-    "star-rating.js": "^3.1.4"
+    "autosize": "^5.0.0",
+    "body-scroll-lock": "^3.1.5",
+    "prismjs": "^1.23.0",
+    "star-rating.js": "^4.1.4",
+    "tippy.js": "^6.3.1"
   },
   "devDependencies": {
-    "gulp": "^4.0.0",
-    "gulp-autoprefixer": "^6.0.0",
-    "gulp-bump": "^3.1.3",
-    "gulp-checktextdomain": "^2.2.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-cssnano": "^2.1.2",
-    "gulp-if": "^2.0.2",
-    "gulp-jshint": "^2.0.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.14.2",
+    "@wordpress/babel-preset-default": "^6.2.0",
+    "babel-plugin-prismjs": "^2.0.1",
+    "browser-sync": "^2.26.14",
+    "browser-sync-webpack-plugin": "^2.2.2",
+    "gulp": "^4.0.2",
+    "gulp-bump": "^3.2.0",
+    "gulp-checktextdomain": "^2.2.2",
     "gulp-potomo": "^1.1.0",
     "gulp-pottopo": "^1.0.1",
-    "gulp-sass": "^4.0.2",
     "gulp-sort": "^2.0.0",
-    "gulp-uglify": "^3.0.1",
-    "gulp-wp-pot": "^2.3.3",
-    "jshint": "^2.10.1",
-    "jshint-stylish": "^2.2.1",
-    "merge-stream": "^1.0.1",
+    "gulp-wp-pot": "^2.5.0",
+    "laravel-mix": "^6.0.19",
+    "laravel-mix-bundle-analyzer": "^1.0.5",
+    "postcss-calc": "^8.0.0",
+    "postcss-custom-properties": "^11.0.0",
+    "postcss-hexrgba": "^2.0.1",
+    "postcss-import": "^14.0.2",
+    "postcss-selector-namespace": "github:pryley/postcss-selector-namespace#master",
+    "precss": "^4.0.0",
     "pump": "^3.0.0",
+    "sass": "^1.34.0",
+    "sass-loader": "^12.0.0",
     "yamljs": "^0.3.0",
-    "yargs": "^12.0.5"
+    "yargs": "^17.0.1"
   },
+  "private": true,
   "scripts": {
-    "build": "./node_modules/gulp/bin/gulp.js build --production"
+    "build": "gulp && mix --production",
+    "development": "mix",
+    "lang": "gulp",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "hot": "mix watch --hot",
+    "production": "mix --production"
   }
 }

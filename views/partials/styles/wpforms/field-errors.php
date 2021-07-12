@@ -1,5 +1,5 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<span class="glsr-field-errors wpforms-error">
-	{{ errors }}
-</span>
+<label class="{{ class }}">
+    {{ errors }}
+</label>

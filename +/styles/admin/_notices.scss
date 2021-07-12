@@ -2,11 +2,67 @@
 // Partials -> Notices
 // =============================================================================
 
-/* WordPress compatibility
--------------------------------------------------------------------- */
-
-body.branch-4 {
-	.notice-warning {
-		border-color: #ffba00;
-	}
+.glsr-notice-branded {
+    border-left-color: #F6E05E !important;
+    padding-left: 123px;
+}
+.glsr-notice-branded-image {
+    align-items: center;
+    border-right: 1px solid #ccd0d4;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    padding: 0 5px;
+    position: absolute;
+    width: 100px;
+}
+.glsr-notice-branded .glsr-notice-branded-image {
+    background-color: #FAF089;
+    top: 0;
+}
+.glsr-notice-premium .glsr-notice-branded-image {
+    background-color: #252f3f;
+    bottom: -1px;
+    top: -1px;
+}
+.glsr-notice-branded-image svg {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.glsr-notice:not(.notice-error):not(.notice-info):not(.notice-warning):not(.glsr-notice-branded) {
+    display: flex;
+    border-left-color: #32373c;
+}
+.glsr-notice-icon {
+    display: flex;
+    align-items: flex-start;
+    margin-left: 6px;
+    margin-top: 18px;
+    margin-right: 18px;
+}
+.glsr-notice-icon img {
+    width: 80px;
+    height: 80px;
+    @media only screen and (min-width: 601px) {
+        width: 96px;
+        height: 96px;
+    }
+}
+.glsr-notice-content {
+    margin: 6px 0;
+}
+.glsr-notice-content h3 {
+    line-height: 1.25;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+.glsr-notice-content p,
+.glsr-notice-content .button {
+    margin-top: 0;
+    margin-bottom: 12px;
 }

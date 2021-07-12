@@ -1,5 +1,5 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<p class="glsr-form-message et-pb-contact-message et_pb_contact_field {{ class }}">
-	{{ message }}
+<p class="{{ class }}">
+    {{ message }}
 </p>

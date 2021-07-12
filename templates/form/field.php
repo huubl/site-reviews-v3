@@ -1,7 +1,7 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<div class="glsr-field {{ class }}">
-	{{ label }}
-	{{ field }}
-	{{ errors }}
+<div class="{{ class }}" data-field="{{ field_name }}">
+    {{ label }}
+    {{ field }}
+    {{ errors }}
 </div>

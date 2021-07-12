@@ -2,30 +2,57 @@
 
 namespace GeminiLabs\SiteReviews\Defaults;
 
+use GeminiLabs\SiteReviews\Database\OptionManager;
 use GeminiLabs\SiteReviews\Defaults\DefaultsAbstract as Defaults;
 
 class EmailDefaults extends Defaults
 {
-	/**
-	 * @return array
-	 */
-	protected function defaults()
-	{
-		$fromName  = wp_specialchars_decode( (string)get_option( 'blogname' ), ENT_QUOTES );
-		$fromEmail = (string)get_option( 'admin_email' );
-		return [
-			'after' => '',
-			'attachments' => [],
-			'bcc' => '',
-			'before' => '',
-			'cc' => '',
-			'from' => $fromName.' <'.$fromEmail.'>',
-			'message' => '',
-			'reply-to' => '',
-			'subject' => '',
-			'template' => '',
-			'template-tags' => [],
-			'to' => '',
-		];
-	}
+    /**
+     * @var array
+     */
+    public $sanitize = [
+        'attachments' => 'array',
+        'template-tags' => 'array',
+    ];
+
+    /**
+     * @return array
+     */
+    protected function defaults()
+    {
+        return [
+            'after' => '',
+            'attachments' => [],
+            'bcc' => '',
+            'before' => '',
+            'cc' => '',
+            'from' => '',
+            'message' => '',
+            'reply-to' => '',
+            'subject' => '',
+            'template' => '',
+            'template-tags' => [],
+            'to' => '',
+        ];
+    }
+
+    /**
+     * Normalize provided values, this always runs first.
+     * @return array
+     */
+    protected function normalize(array $values = [])
+    {
+        if (empty($values['from'])) {
+            $email = sanitize_email(glsr_get_option('general.notification_from', null, 'string'));
+            if (empty($email)) {
+                $email = glsr(OptionManager::class)->getWP('admin_email');
+            }
+            $from = wp_specialchars_decode(glsr(OptionManager::class)->getWP('blogname'), ENT_QUOTES);
+            $values['from'] = sprintf('%s <%s>', $from, $email);
+        }
+        if (empty($values['reply-to'])) {
+            $values['reply-to'] = $values['from'];
+        }
+        return parent::normalize($values);
+    }
 }

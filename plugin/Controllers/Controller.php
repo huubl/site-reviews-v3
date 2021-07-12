@@ -2,62 +2,61 @@
 
 namespace GeminiLabs\SiteReviews\Controllers;
 
-use Exception;
-use GeminiLabs\SiteReviews\Application;
-use GeminiLabs\SiteReviews\Modules\Notice;
-use InvalidArgumentException;
-use WP_Error;
+use GeminiLabs\SiteReviews\Contracts\CommandContract;
+use WP_Query;
 
 abstract class Controller
 {
-	/**
-	 * @return void
-	 */
-	public function download( $filename, $content )
-	{
-		if( !current_user_can( glsr()->constant( 'CAPABILITY' )))return;
-		nocache_headers();
-		header( 'Content-Type: text/plain' );
-		header( 'Content-Disposition: attachment; filename="'.$filename.'"' );
-		echo html_entity_decode( $content );
-		exit;
-	}
+    /**
+     * @return void
+     */
+    public function download($filename, $content)
+    {
+        if (glsr()->can('edit_others_posts')) {
+            nocache_headers();
+            header('Content-Type: text/plain');
+            header('Content-Disposition: attachment; filename="'.$filename.'"');
+            echo html_entity_decode($content);
+            exit;
+        }
+    }
 
-	/**
-	 * @param object $command
-	 * @return mixed
-	 * @throws InvalidArgumentException
-	 */
-	public function execute( $command )
-	{
-		$handlerClass = str_replace( 'Commands', 'Handlers', get_class( $command ));
-		if( !class_exists( $handlerClass )) {
-			throw new InvalidArgumentException( 'Handler '.$handlerClass.' not found.' );
-		}
-		try {
-			return glsr( $handlerClass )->handle( $command );
-		}
-		catch( Exception $e ) {
-			status_header( 400 );
-			glsr( Notice::class )->addError( new WP_Error( 'site_reviews_error', $e->getMessage() ));
-			glsr_log()->error( $e->getMessage() );
-		}
-	}
+    /**
+     * @return mixed
+     */
+    public function execute(CommandContract $command)
+    {
+        if (method_exists($command, 'handle')) {
+            return $command->handle();
+        }
+    }
 
-	/**
-	 * @return int
-	 */
-	protected function getPostId()
-	{
-		return intval( filter_input( INPUT_GET, 'post' ));
-	}
+    /**
+     * @return int
+     */
+    protected function getPostId()
+    {
+        return intval(filter_input(INPUT_GET, 'post'));
+    }
 
-	/**
-	 * @param int $postId
-	 * @return bool
-	 */
-	protected function isReviewPostId( $postId )
-	{
-		return get_post_field( 'post_type', $postId ) == Application::POST_TYPE;
-	}
+    /**
+     * @return bool
+     */
+    protected function hasQueryPermission(WP_Query $query)
+    {
+        global $pagenow;
+        return glsr()->isAdmin()
+            && $query->is_main_query()
+            && glsr()->post_type === $query->get('post_type')
+            && 'edit.php' === $pagenow;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isReviewAdminPage()
+    {
+        return glsr()->isAdmin()
+            && in_array(glsr()->post_type, [get_post_type(), filter_input(INPUT_GET, 'post_type')]);
+    }
 }

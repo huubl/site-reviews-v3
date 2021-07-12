@@ -1,50 +1,50 @@
 /** global: GLSR */
-;(function() {
 
-	'use strict';
+const config = {
+    hiddenClass: 'glsr-hidden',
+    hiddenTextSelector: '.glsr-hidden-text',
+    readMoreClass: 'glsr-read-more',
+    visibleClass: 'glsr-visible',
+}
 
-	GLSR.Excerpts = function( el ) { // HTMLElement
-		this.init_( el || document );
-	};
+class Excerpts {
+    constructor (el) {
+        const excerpts = (el || document).querySelectorAll(config.hiddenTextSelector);
+        [].forEach.call(excerpts, el => this.init(el));
+        GLSR.Event.trigger('site-reviews/excerpts/init', el);
+    }
 
-	GLSR.Excerpts.prototype = {
-		config: {
-			hiddenClass: 'glsr-hidden',
-			hiddenTextSelector: '.glsr-hidden-text',
-			readMoreClass: 'glsr-read-more',
-			visibleClass: 'glsr-visible',
-		},
+    init (el) {
+        if (el.parentNode.querySelector('.' + config.readMoreClass)) return; // @hack only init once
+        const trigger = el.dataset.trigger;
+        const readMoreSpan = document.createElement('span');
+        const readmoreLink = document.createElement('a');
+        readmoreLink.setAttribute('href', '#');
+        readmoreLink.innerHTML = el.dataset.showMore;
+        if ('excerpt' === trigger) { // don't trigger for modals
+            readmoreLink.addEventListener('click', this.onClick.bind(this));
+            // we can't use dataset until the node has been inserted in the DOM
+            readmoreLink.setAttribute('data-text', el.dataset.showLess);
+        }
+        if ('modal' === trigger) {
+            // we can't use dataset until the node has been inserted in the DOM
+            readmoreLink.setAttribute('data-excerpt-trigger', 'glsr-modal');
+        }
+        readMoreSpan.setAttribute('class', config.readMoreClass);
+        readMoreSpan.appendChild(readmoreLink);
+        el.parentNode.insertBefore(readMoreSpan, el.nextSibling);
+    }
 
-		/** @return void */
-		createLinks_: function( el ) { // HTMLElement
-			var readMoreSpan = document.createElement( 'span' );
-			var readmoreLink = document.createElement( 'a' );
-			readmoreLink.setAttribute( 'href', '#' );
-			readmoreLink.setAttribute( 'data-text', el.getAttribute( 'data-show-less' ));
-			readmoreLink.innerHTML = el.getAttribute( 'data-show-more' );
-			readmoreLink.addEventListener( 'click', this.onClick_.bind( this ));
-			readMoreSpan.setAttribute( 'class', this.config.readMoreClass );
-			readMoreSpan.appendChild( readmoreLink );
-			el.parentNode.insertBefore( readMoreSpan, el.nextSibling );
-		},
+    onClick (ev) {
+        ev.preventDefault();
+        const el = ev.currentTarget;
+        const hiddenNode = el.parentNode.previousSibling;
+        const text = el.dataset.text;
+        hiddenNode.classList.toggle(config.hiddenClass);
+        hiddenNode.classList.toggle(config.visibleClass);
+        el.dataset.text = el.innerText;
+        el.innerText = text;
+    }
+}
 
-		/** @return void */
-		onClick_: function( ev ) { // MouseEvent
-			ev.preventDefault();
-			var el = ev.currentTarget;
-			var hiddenNode = el.parentNode.previousSibling;
-			var text = el.getAttribute( 'data-text' );
-			hiddenNode.classList.toggle( this.config.hiddenClass );
-			hiddenNode.classList.toggle( this.config.visibleClass );
-			el.setAttribute( 'data-text', el.innerText );
-			el.innerText = text;
-		},
-
-		init_: function( el ) { // HTMLElement
-			var excerpts = el.querySelectorAll( this.config.hiddenTextSelector );
-			for( var i = 0; i < excerpts.length; i++ ) {
-				this.createLinks_( excerpts[i] );
-			}
-		},
-	};
-})();
+export default Excerpts;

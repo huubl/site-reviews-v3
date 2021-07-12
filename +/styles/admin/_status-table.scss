@@ -23,7 +23,7 @@
 	top: 0;
 }
 
-.glsr-status .toggle-row:before {
+.glsr-status .toggle-row::before {
 	top: 6px;
 }
 
@@ -35,7 +35,7 @@
 }
 
 @media screen and (max-width: 782px) {
-	.glsr-status th input[type="radio"] {
+	.glsr-status th input[type=radio] {
 		margin-bottom: 8px;
 	}
 	.glsr-status thead td.glsr-radio-column,

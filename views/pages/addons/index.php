@@ -1,32 +1,86 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
 <div class="wrap">
-	<h1 class="page-title"><?= esc_html( get_admin_page_title() ); ?></h1>
-	<div class="notice notice-warning is-dismissible">
-		<p><?= __( 'Now that Site Reviews v3.0 (a major overhaul of the plugin) has been released, the only thing delaying the add-ons is the distribution platform which is currently being built. Expect to see them in the coming months!', 'site-reviews' ); ?></p>
-		<p><?= __( 'Thank you for your patience.', 'site-reviews' ); ?></p>
-	</div>
-	<p><?= __( 'Add-ons extend the functionality of Site Reviews.', 'site-reviews' ); ?></p>
-	<div class="glsr-addons wp-clearfix">
-	<?php
-		$template->render( 'partials/addons/addon', [
-			'context' => [
-				'description' => __( 'Allow your visitors to submit multiple images with their reviews.', 'site-reviews' ),
-				'link' => 'https://niftyplugins.com/addons/site-reviews-images/',
-				'slug' => 'images',
-				'title' => 'Images',
-			],
-			'plugin' => 'site-reviews-images/site-reviews-images.php',
-		]);
-		$template->render( 'partials/addons/addon', [
-			'context' => [
-				'description' => __( 'Sync your Tripadvisor reviews to your website and manage them with Site Reviews.', 'site-reviews' ),
-				'link' => 'https://niftyplugins.com/addons/site-reviews-tripadvisor/',
-				'slug' => 'tripadvisor',
-				'title' => 'Tripadvisor Reviews',
-			],
-			'plugin' => 'site-reviews-tripadvisor/site-reviews-tripadvisor.php',
-		]);
-	?>
-	</div>
+    <h1 class="wp-heading-inline">
+        <?= esc_html(get_admin_page_title()); ?>
+        <a href="<?= admin_url('index.php?page='.glsr()->id.'-welcome'); ?>" class="page-title-action"><?= _x('About', 'admin-text', 'site-reviews'); ?></a>
+    </h1>
+    <?= $notices; ?>
+    <div class="notice notice-success">
+        <p>If you love Site Reviews and would like to support my work, please consider purchasing some add-ons. ❤️</p>
+    </div>
+    <div class="glsr-addons">
+    <?php
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('The Premium license allows you to install all of the add-ons, including all future add-ons as they become available!', 'admin-text', 'site-reviews').' 👀',
+                'link' => 'https://niftyplugins.com/plugins/site-reviews-premium/',
+                'link_text' => _x('Discover Premium', 'admin-text', 'site-reviews'),
+                'slug' => 'premium',
+                'title' => 'Site Reviews Premium',
+            ],
+            'plugin' => '',
+        ]);
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('Allow your website visitors to sort, filter by rating, and search reviews.', 'admin-text', 'site-reviews'),
+                'link' => 'https://niftyplugins.com/plugins/site-reviews-filters/',
+                'link_text' => _x('View Add-on', 'admin-text', 'site-reviews'),
+                'slug' => 'filters',
+                'title' => 'Review Filters',
+            ],
+            'plugin' => 'site-reviews-filters/site-reviews-filters.php',
+        ]);
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('Create unique review forms with custom fields and review templates.', 'admin-text', 'site-reviews'),
+                'link' => 'https://niftyplugins.com/plugins/site-reviews-forms/',
+                'link_text' => _x('View Add-on', 'admin-text', 'site-reviews'),
+                'slug' => 'forms',
+                'title' => 'Review Forms',
+            ],
+            'plugin' => 'site-reviews-forms/site-reviews-forms.php',
+        ]);
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('Allow your website visitors to add images with captions to their reviews.', 'admin-text', 'site-reviews'),
+                'link' => 'https://niftyplugins.com/plugins/site-reviews-images/',
+                'link_text' => _x('View Add-on', 'admin-text', 'site-reviews'),
+                'slug' => 'images',
+                'title' => 'Review Images',
+            ],
+            'plugin' => 'site-reviews-images/site-reviews-images.php',
+        ]);
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('Create custom review designs, display reviews in a grid, change the rating images, and more. Early access available to Premium members only.', 'admin-text', 'site-reviews'),
+                'link' => 'https://niftyplugins.com/account/',
+                'link_text' => _x('Request Early Access', 'admin-text', 'site-reviews'),
+                'slug' => 'themes',
+                'title' => 'Review Themes',
+            ],
+            'plugin' => 'site-reviews-themes/site-reviews-themes.php',
+        ]);
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('Integrate with the Trustalyze Confidence System and post reviews to the blockchain.', 'admin-text', 'site-reviews'),
+                'link' => 'https://niftyplugins.com/plugins/trustalyze/',
+                'link_text' => _x('View Add-on', 'admin-text', 'site-reviews'),
+                'slug' => 'trustalyze',
+                'title' => 'Trustalyze',
+            ],
+            'plugin' => 'site-reviews-trustalyze/site-reviews-trustalyze.php',
+        ]);
+        $template->render('partials/addons/addon', [
+            'context' => [
+                'description' => _x('Integrate Site Reviews with your Woocommerce products.', 'admin-text', 'site-reviews'),
+                'link' => 'https://niftyplugins.com/plugins/woocommerce-reviews/',
+                'link_text' => _x('View Add-on', 'admin-text', 'site-reviews'),
+                'slug' => 'woocommerce',
+                'title' => 'Woocommerce Reviews',
+            ],
+            'plugin' => 'site-reviews-woocommerce/site-reviews-woocommerce.php',
+        ]);
+    ?>
+    </div>
 </div>

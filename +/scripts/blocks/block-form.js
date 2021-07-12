@@ -1,157 +1,123 @@
-/** global: GLSR */
+import { CheckboxControlList } from './checkbox-control-list';
+import { FormIcon } from './icons';
+import assign_to_options from './assign_to-options';
+import category_options from './category-options';
+import user_options from './user-options';
+import ConditionalSelectControl from './ConditionalSelectControl';
 
-(function( blocks, components, editor, element, i18n ) {
-	'use strict';
-	var __ = i18n.__;
-	var blockName = GLSR.nameprefix + '/form';
-	var el = element.createElement;
-	var Inspector = editor.InspectorControls;
-	var AdvancedInspector = editor.InspectorAdvancedControls;
-	var PanelBody = components.PanelBody;
-	var ServerSideRender = components.ServerSideRender;
-	var TextControl = components.TextControl;
-	var SelectControl = components.SelectControl;
-	var selectPlaceholder = { label: '- ' + __( 'Select', 'site-reviews' ) + ' -', value: '' };
+const { _x } = wp.i18n;
+const { registerBlockType } = wp.blocks;
+const { InspectorAdvancedControls, InspectorControls } = wp.blockEditor;
+const { PanelBody, SelectControl, TextControl } = wp.components;
+const { serverSideRender: ServerSideRender } = wp;
 
-	var categories = [];
-	wp.apiFetch({ path: '/site-reviews/v1/categories'}).then( function( terms ) {
-		categories.push(selectPlaceholder);
-		$.each( terms, function( key, term ) {
-			categories.push({ label: term.name, value: term.id });
-		});
-	});
+const blockName = GLSR.nameprefix + '/form';
 
-	var toggleHide = function( key, isChecked, props ) {
-		var hide = _.without( props.attributes.hide.split(','), '' );
-		if( isChecked ) {
-			hide.push( key );
-		}
-		else {
-			hide = _.without( hide, key );
-		}
-		props.setAttributes({ hide: hide.toString() });
-	};
+const attributes = {
+    assign_to: { default: '', type: 'string' },
+    assigned_posts: { default: '', type: 'string' },
+    assigned_terms: { default: '', type: 'string' },
+    assigned_users: { default: '', type: 'string' },
+    category: { default: '', type: 'string' },
+    className: { default: '', type: 'string' },
+    hide: { default: '', type: 'string' },
+    id: { default: '', type: 'string' },
+    user: { default: '', type: 'string' },
+};
 
-	var checkboxControl = function( id, key, label, props ) {
-		return el( 'div',
-			{ className: 'components-base-control__field' },
-			el( 'input', {
-				checked: props.attributes.hide.split(',').indexOf( key ) > -1,
-				className: 'components-checkbox-control__input',
-				id: 'inspector-checkbox-control-hide-' + id,
-				type: 'checkbox',
-				value: 1,
-				onChange: function( ev ) {
-					toggleHide( key, ev.target.checked, props );
-				},
-			}),
-			el( 'label', {
-				className: 'components-checkbox-control__label',
-				htmlFor: 'inspector-checkbox-control-hide-' + id,
-			}, label )
-		);
-	};
+const edit = props => {
+    const { attributes: { assign_to, assigned_posts, assigned_terms, assigned_users, category, hide, id, user }, className, setAttributes } = props;
+    const inspectorControls = {
+        assign_to: <ConditionalSelectControl
+            key={ 'assigned_posts' }
+            label={ _x('Assign Reviews to a Page', 'admin-text', 'site-reviews') }
+            onChange={ assign_to => setAttributes({
+                assign_to: assign_to,
+                assigned_posts: ('custom' === assign_to ? assigned_posts : ''),
+            })}
+            options={ assign_to_options }
+            value={ assign_to }
+        >
+            <TextControl
+                className="glsr-base-conditional-control"
+                help={ _x('Separate with commas.', 'admin-text', 'site-reviews') }
+                onChange={ assigned_posts => setAttributes({ assigned_posts }) }
+                placeholder={ _x('Enter the Post IDs', 'admin-text', 'site-reviews') }
+                type="text"
+                value={ assigned_posts }
+            />
+        </ConditionalSelectControl>,
+        category: <ConditionalSelectControl
+            key={ 'assigned_terms' }
+            custom_value={ 'glsr_custom' }
+            label={ _x('Assign Reviews to a Category', 'admin-text', 'site-reviews') }
+            onChange={ category => setAttributes({
+                category: category,
+                assigned_terms: ('glsr_custom' === category ? assigned_terms : ''),
+            })}
+            options={ category_options }
+            value={ category }
+        >
+            <TextControl
+                className="glsr-base-conditional-control"
+                help={ _x('Separate with commas.', 'admin-text', 'site-reviews') }
+                onChange={ assigned_terms => setAttributes({ assigned_terms }) }
+                placeholder={ _x('Enter the Category IDs or slugs', 'admin-text', 'site-reviews') }
+                type="text"
+                value={ assigned_terms }
+            />
+        </ConditionalSelectControl>,
+        user: <ConditionalSelectControl
+            key={ 'assigned_users' }
+            custom_value={ 'glsr_custom' }
+            label={ _x('Assign Reviews to a User', 'admin-text', 'site-reviews') }
+            onChange={ user => setAttributes({
+                user: user,
+                assigned_users: ('glsr_custom' === user ? assigned_users : ''),
+            })}
+            options={ user_options }
+            value={ user }
+        >
+            <TextControl
+                className="glsr-base-conditional-control"
+                help={ _x('Separate with commas.', 'admin-text', 'site-reviews') }
+                onChange={ assigned_users => setAttributes({ assigned_users }) }
+                placeholder={ _x('Enter the User IDs or usernames', 'admin-text', 'site-reviews') }
+                type="text"
+                value={ assigned_users }
+            />
+        </ConditionalSelectControl>,
+        hide: CheckboxControlList(GLSR.hideoptions.site_reviews_form, hide, setAttributes),
+    };
+    const inspectorAdvancedControls = {
+        id: <TextControl
+            label={ _x('Custom ID', 'admin-text', 'site-reviews') }
+            onChange={ id => setAttributes({ id }) }
+            value={ id }
+        />,
+    };
+    return [
+        <InspectorControls>
+            <PanelBody title={ _x('Settings', 'admin-text', 'site-reviews')}>
+                { Object.values(wp.hooks.applyFilters(GLSR.nameprefix+'.form.InspectorControls', inspectorControls, props)) }
+            </PanelBody>
+        </InspectorControls>,
+        <InspectorAdvancedControls>
+            { Object.values(wp.hooks.applyFilters(GLSR.nameprefix+'.form.InspectorAdvancedControls', inspectorAdvancedControls, props)) }
+        </InspectorAdvancedControls>,
+        <ServerSideRender block={ blockName } attributes={ props.attributes }>
+        </ServerSideRender>
+    ];
+};
 
-	var checkboxesControl = function( checkboxes, props ) {
-		var i = 0;
-		var elements = ['div', { className: 'components-base-control' }];
-		for( var name in checkboxes ) {
-			if( !checkboxes.hasOwnProperty( name ))continue;
-			elements.push( checkboxControl( i, name, checkboxes[name], props ));
-			i++;
-		}
-		return el.apply( null, elements );
-	};
-
-	var attributes = {
-		assign_to: {
-			default: '',
-			type: 'string',
-		},
-		category: {
-			default: '',
-			type: 'string',
-		},
-		className: {
-			default: '',
-			type: 'string',
-		},
-		hide: {
-			default: '',
-			type: 'string',
-		},
-		id: {
-			default: '',
-			type: 'string',
-		},
-	};
-
-	var edit = function( props ) {
-		return [
-			el( Inspector,
-				{ key: 'inspector' },
-				el( PanelBody,
-					{ title: __( 'Settings', 'site-reviews' ) },
-					el( TextControl, {
-						help: __( 'Assign reviews to a post ID. You can also enter "post_id" to use the ID of the current page, or "parent_id" to use the ID of the parent page.', 'site-reviews' ),
-						label: __( 'Assign To', 'site-reviews' ),
-						onChange: function( value ) {
-							props.setAttributes({ assign_to: value });
-						},
-						type: 'text',
-						value: props.attributes.assign_to,
-					}),
-					el( SelectControl, {
-						help: __( 'Assign reviews to a category.', 'site-reviews' ),
-						label: __( 'Category', 'site-reviews' ),
-						onChange: function( value ) {
-							props.setAttributes({ category: value });
-						},
-						options: categories,
-						value: props.attributes.category,
-					}),
-					checkboxesControl.apply( null, [GLSR.hideoptions.site_reviews_form, props] )
-				)
-			),
-			el( AdvancedInspector,
-				null,
-				el( TextControl, {
-					label: __( 'Custom ID', 'site-reviews' ),
-					onChange: function( value ) {
-						props.setAttributes({ id: value });
-					},
-					type: 'text',
-					value: props.attributes.id,
-				})
-			),
-			el( ServerSideRender, {
-				block: blockName,
-				attributes: props.attributes,
-			})
-		];
-	};
-
-	blocks.registerBlockType( blockName, {
-		attributes: attributes,
-		category: GLSR.nameprefix,
-		description: __( 'Display a review submission form.', 'site-reviews' ),
-		edit: edit,
-		icon: el( components.SVG, {
-			width: '22px',
-			height: '22px',
-			viewBox: '0 0 22 22',
-			xmlns: 'http://www.w3.org/2000/svg',
-		}, el( components.Path, {
-			d: 'M11 2l-3 6-6 .75 4.13 4.62-1.13 6.63 6-3 6 3-1.12-6.63 4.12-4.62-6-.75-3-6zm0 2.24l2.34 4.69 4.65.58-3.18 3.56.87 5.15-4.68-2.34v-11.64zm8.28-.894v.963h-3.272v2.691h-1.017v-6.3h4.496v.963h-3.479v1.683h3.272z',
-		})),
-		// keywords: ['recent reviews'],
-		save: function() { return null; },
-		title: 'Submit a Review',
-	});
-})(
-	window.wp.blocks,
-	window.wp.components,
-	window.wp.editor,
-	window.wp.element,
-	window.wp.i18n
-);
+export default registerBlockType(blockName, {
+    attributes: attributes,
+    category: GLSR.nameprefix,
+    description: _x('Display a review form.', 'admin-text', 'site-reviews'),
+    edit: edit,
+    example: {},
+    icon: {src: FormIcon},
+    keywords: ['reviews', 'form'],
+    save: () => null,
+    title: _x('Submit a Review', 'admin-text', 'site-reviews'),
+});

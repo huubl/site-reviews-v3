@@ -1,12 +1,12 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<div class="glsr-review">
-	{{ title }}
-	{{ rating }}
-	{{ date }}
-	{{ assigned_to }}
-	{{ content }}
-	{{ avatar }}
-	{{ author }}
-	{{ response }}
+<div class="glsr-review" id="review-{{ review_id }}" data-assigned='{{ assigned }}'>
+    {{ title }}
+    {{ rating }}
+    {{ date }}
+    {{ assigned_links }}
+    {{ content }}
+    {{ avatar }}
+    {{ author }}
+    {{ response }}
 </div>

@@ -2,110 +2,154 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Html;
 
-use ArrayObject;
 use GeminiLabs\SiteReviews\Database\OptionManager;
-use GeminiLabs\SiteReviews\Modules\Html\Partial;
-use GeminiLabs\SiteReviews\Modules\Html\Template;
+use GeminiLabs\SiteReviews\Defaults\SiteReviewsDefaults;
+use GeminiLabs\SiteReviews\Helper;
+use GeminiLabs\SiteReviews\Modules\Style;
 use GeminiLabs\SiteReviews\Reviews;
 
-class ReviewsHtml extends ArrayObject
+class ReviewsHtml extends \ArrayObject
 {
-	/**
-	 * @var array
-	 */
-	public $args;
+    /**
+     * @var \GeminiLabs\SiteReviews\Arguments
+     */
+    public $args;
 
-	/**
-	 * @var string
-	 */
-	public $navigation;
+    /**
+     * @var int
+     */
+    public $max_num_pages;
 
-	/**
-	 * @var array
-	 */
-	public $reviews;
+    /**
+     * @var Reviews
+     */
+    public $reviews;
 
-	public function __construct( array $reviews, $maxPageCount, array $args )
-	{
-		$this->args = $args;
-		$this->reviews = $reviews;
-		$this->navigation = glsr( Partial::class )->build( 'pagination', [
-			'total' => $maxPageCount,
-		]);
-		parent::__construct( $reviews, ArrayObject::STD_PROP_LIST|ArrayObject::ARRAY_AS_PROPS );
-	}
+    /**
+     * @var array
+     */
+    public $rendered;
 
-	/**
-	 * @return string
-	 */
-	public function __get( $key )
-	{
-		return array_key_exists( $key, $this->reviews )
-			? $this->reviews[$key]
-			: '';
-	}
+    /**
+     * @var string
+     */
+    public $style;
 
-	/**
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return glsr( Template::class )->build( 'templates/reviews', [
-			'context' => [
-				'assigned_to' => $this->args['assigned_to'],
-				'class' => $this->getClass(),
-				'id' => $this->args['id'],
-				'navigation' => $this->getNavigation(),
-				'reviews' => $this->getReviews(),
-			],
-		]);
-	}
+    public function __construct(Reviews $reviews)
+    {
+        $this->args = glsr()->args($reviews->args);
+        $this->max_num_pages = $reviews->max_num_pages;
+        $this->reviews = $reviews;
+        $this->rendered = $this->renderReviews($reviews);
+        $this->style = glsr(Style::class)->styleClasses();
+        parent::__construct($this->reviews, \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS);
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getClass()
-	{
-		$defaults = [
-			'glsr-reviews', 'glsr-default',
-		];
-		if( $this->args['pagination'] == 'ajax' ) {
-			$defaults[] = 'glsr-ajax-pagination';
-		}
-		$classes = explode( ' ', $this->args['class'] );
-		$classes = array_unique( array_merge( $defaults, $classes ));
-		return implode( ' ', $classes );
-	}
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return glsr(Template::class)->build('templates/reviews', [
+            'args' => $this->args,
+            'context' => [
+                'assigned_to' => $this->args->assigned_posts,
+                'category' => $this->args->assigned_terms,
+                'class' => $this->getClasses(),
+                'id' => '', // @deprecated in v5.0
+                'pagination' => Helper::ifTrue(!empty($this->args->pagination), $this->getPagination()),
+                'reviews' => $this->getReviews(),
+            ],
+            'reviews' => $this->reviews,
+        ]);
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getNavigation()
-	{
-		return wp_validate_boolean( $this->args['pagination'] )
-			? $this->navigation
-			: '';
-	}
+    /**
+     * @param bool $wrap
+     * @return string
+     */
+    public function getPagination($wrap = true)
+    {
+        $html = glsr(Partial::class)->build('pagination', [
+            'add_args' => $this->args->pageUrlParameters,
+            'baseUrl' => $this->args->pageUrl,
+            'current' => $this->args->page,
+            'total' => $this->max_num_pages,
+        ]);
+        if (!$wrap || empty($html)) { // only display the pagination when it's needed
+            return $html;
+        }
+        $ajaxClass = Helper::ifTrue('ajax' == $this->args->pagination, 'glsr-ajax-pagination');
+        $dataAttributes = glsr(SiteReviewsDefaults::class)->dataAttributes($this->args->toArray());
+        return glsr(Builder::class)->div(wp_parse_args([
+            'class' => trim('glsr-pagination '.$ajaxClass),
+            'data-id' => $this->args->id,
+            'text' => $html,
+        ], $dataAttributes));
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getReviews()
-	{
-		return empty( $this->reviews )
-			? $this->getReviewsFallback()
-			: implode( PHP_EOL, $this->reviews );
-	}
+    /**
+     * @return string
+     */
+    public function getReviews()
+    {
+        return empty($this->rendered)
+            ? $this->getReviewsFallback()
+            : implode(PHP_EOL, $this->rendered);
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getReviewsFallback()
-	{
-		if( empty( $this->args['fallback'] ) && glsr( OptionManager::class )->getBool( 'settings.reviews.fallback' )) {
-			$this->args['fallback'] = __( 'There are no reviews yet. Be the first one to write one.', 'site-reviews' );
-		}
-		$fallback = '<p class="glsr-no-margins">'.$this->args['fallback'].'</p>';
-		return apply_filters( 'site-reviews/reviews/fallback', $fallback, $this->args );
-	}
+    /**
+     * @param mixed $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        if (array_key_exists($key, $this->rendered)) {
+            return $this->rendered[$key];
+        }
+        if (in_array($key, ['navigation', 'pagination'])) { // @deprecated in v5.0 (navigation)
+            return $this->getPagination();
+        }
+        return property_exists($this, $key)
+            ? $this->$key
+            : null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getClasses()
+    {
+        $defaults = ['glsr-reviews'];
+        $classes = explode(' ', $this->args->class);
+        $classes = array_unique(array_merge($defaults, array_filter($classes)));
+        return implode(' ', $classes);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getReviewsFallback()
+    {
+        if (empty($this->args->fallback) && glsr(OptionManager::class)->getBool('settings.reviews.fallback')) {
+            $this->args->fallback = __('There are no reviews yet. Be the first one to write one.', 'site-reviews');
+        }
+        $fallback = glsr(Builder::class)->p([
+            'class' => 'glsr-no-margins',
+            'text' => $this->args->fallback,
+        ]);
+        return glsr()->filterString('reviews/fallback', $fallback, $this->args->toArray());
+    }
+
+    /**
+     * @return array
+     */
+    protected function renderReviews(Reviews $reviews)
+    {
+        $rendered = [];
+        foreach ($reviews as $review) {
+            $rendered[] = $review->build($this->args->toArray());
+        }
+        return $rendered;
+    }
 }

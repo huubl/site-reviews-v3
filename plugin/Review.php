@@ -2,181 +2,337 @@
 
 namespace GeminiLabs\SiteReviews;
 
-use GeminiLabs\SiteReviews\Application;
-use GeminiLabs\SiteReviews\Database\OptionManager;
-use GeminiLabs\SiteReviews\Defaults\CreateReviewDefaults;
-use GeminiLabs\SiteReviews\Defaults\SiteReviewsDefaults;
-use GeminiLabs\SiteReviews\Helper;
-use GeminiLabs\SiteReviews\Modules\Html\Partials\SiteReviews as SiteReviewsPartial;
+use GeminiLabs\SiteReviews\Database\Query;
+use GeminiLabs\SiteReviews\Defaults\ReviewDefaults;
+use GeminiLabs\SiteReviews\Helpers\Arr;
+use GeminiLabs\SiteReviews\Helpers\Cast;
+use GeminiLabs\SiteReviews\Helpers\Str;
+use GeminiLabs\SiteReviews\Modules\Avatar;
 use GeminiLabs\SiteReviews\Modules\Html\ReviewHtml;
-use WP_Post;
 
-class Review implements \ArrayAccess
+/**
+ * @property bool $approved  This property is mapped to $is_approved
+ * @property array $assigned_posts
+ * @property array $assigned_terms
+ * @property array $assigned_users
+ * @property string $author
+ * @property int $author_id
+ * @property string $avatar
+ * @property string $content
+ * @property Arguments $custom
+ * @property string $date
+ * @property string $date_gmt
+ * @property string $name  This property is mapped to $author
+ * @property string $email
+ * @property bool $has_revisions  This property is mapped to $is_modified
+ * @property int $ID
+ * @property string $ip_address
+ * @property bool $is_approved
+ * @property bool $is_modified
+ * @property bool $is_pinned
+ * @property bool $modified  This property is mapped to $is_modified
+ * @property bool $pinned  This property is mapped to $is_pinned
+ * @property int $rating
+ * @property int $rating_id
+ * @property string $response
+ * @property string $status
+ * @property bool $terms
+ * @property string $title
+ * @property string $type
+ * @property string $url
+ * @property int $user_id  This property is mapped to $author_id
+ */
+class Review extends Arguments
 {
-	public $assigned_to;
-	public $author;
-	public $avatar;
-	public $content;
-	public $custom;
-	public $date;
-	public $email;
-	public $ID;
-	public $ip_address;
-	public $modified;
-	public $pinned;
-	public $rating;
-	public $response;
-	public $review_id;
-	public $review_type;
-	public $status;
-	public $term_ids;
-	public $title;
-	public $url;
-	public $user_id;
+    /**
+     * @var Arguments
+     */
+    protected $_meta;
 
-	public function __construct( WP_Post $post )
-	{
-		if( $post->post_type != Application::POST_TYPE )return;
-		$this->content = $post->post_content;
-		$this->date = $post->post_date;
-		$this->ID = intval( $post->ID );
-		$this->status = $post->post_status;
-		$this->title = $post->post_title;
-		$this->user_id = intval( $post->post_author );
-		$this->setProperties( $post );
-		$this->setTermIds( $post );
-	}
+    /**
+     * @var \WP_Post
+     */
+    protected $_post;
 
-	/**
-	 * @return mixed
-	 */
-	public function __get( $key )
-	{
-		return $this->offsetGet( $key );
-	}
+    /**
+     * @var bool
+     */
+    protected $has_checked_revisions;
 
-	/**
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return (string)$this->build();
-	}
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @return ReviewHtml
-	 */
-	public function build( array $args = [] )
-	{
-		if( empty( $this->ID )) {
-			return new ReviewHtml;
-		}
-		$partial = glsr( SiteReviewsPartial::class );
-		$partial->args = glsr( SiteReviewsDefaults::class )->merge( $args );
-		$partial->options = glsr( Helper::class )->flattenArray( glsr( OptionManager::class )->all() );
-		return $partial->buildReview( $this );
-	}
+    /**
+     * @param array|object $values
+     */
+    public function __construct($values)
+    {
+        $values = glsr()->args($values);
+        $this->id = Cast::toInt($values->review_id);
+        $args = glsr(ReviewDefaults::class)->restrict($values->toArray());
+        $args['avatar'] = glsr(Avatar::class)->url($values->avatar);
+        $args['custom'] = $this->custom();
+        $args['ID'] = $this->id;
+        $args['response'] = $this->meta()->_response;
+        parent::__construct($args);
+    }
 
-	/**
-	 * @param mixed $key
-	 * @return bool
-	 */
-	public function offsetExists( $key )
-	{
-		return property_exists( $this, $key ) || array_key_exists( $key, (array)$this->custom );
-	}
+    /**
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        array_unshift($args, $this);
+        $result = apply_filters_ref_array(glsr()->id.'/review/call/'.$method, $args);
+        if (!is_a($result, get_class($this))) {
+            return $result;
+        }
+    }
 
-	/**
-	 * @param mixed $key
-	 * @return mixed
-	 */
-	public function offsetGet( $key )
-	{
-		if( property_exists( $this, $key )) {
-			return $this->$key;
-		}
-		if( array_key_exists( $key, (array)$this->custom )) {
-			return $this->custom[$key];
-		}
-		return null;
-	}
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->build();
+    }
 
-	/**
-	 * @param mixed $key
-	 * @param mixed $value
-	 * @return void
-	 */
-	public function offsetSet( $key, $value )
-	{
-		if( property_exists( $this, $key )) {
-			$this->$key = $value;
-			return;
-		}
-		if( !is_array( $this->custom )) {
-			$this->custom = array_filter( (array)$this->custom );
-		}
-		$this->custom[$key] = $value;
-	}
+    /**
+     * @return array
+     */
+    public function assignedPosts()
+    {
+        if (empty($this->assigned_posts)) {
+            return $this->assigned_posts;
+        }
+        return get_posts([
+            'post__in' => $this->assigned_posts,
+            'post_type' => 'any',
+            'posts_per_page' => -1,
+        ]);
+    }
 
-	/**
-	 * @param mixed $key
-	 * @return void
-	 */
-	public function offsetUnset( $key )
-	{
-		$this->offsetSet( $key, null );
-	}
+    /**
+     * @return array
+     */
+    public function assignedTerms()
+    {
+        if (empty($this->assigned_terms)) {
+            return $this->assigned_terms;
+        }
+        $terms = get_terms(glsr()->taxonomy, ['include' => $this->assigned_terms]);
+        if (is_wp_error($terms)) {
+            return $this->assigned_terms;
+        }
+        return $terms;
+    }
 
-	/**
-	 * @return void
-	 */
-	public function render()
-	{
-		echo $this->build();
-	}
+    /**
+     * @return array
+     */
+    public function assignedUsers()
+    {
+        if (empty($this->assigned_users)) {
+            return $this->assigned_users;
+        }
+        return get_users([
+            'fields' => ['display_name', 'ID', 'user_email', 'user_nicename', 'user_url'],
+            'include' => $this->assigned_users,
+        ]);
+    }
 
-	/**
-	 * @return bool
-	 */
-	protected function isModified( array $properties )
-	{
-		return $this->date != $properties['date']
-			|| $this->content != $properties['content']
-			|| $this->title != $properties['title'];
-	}
+    /**
+     * @param int $size
+     * @return string
+     */
+    public function avatar($size = null)
+    {
+        return glsr(Avatar::class)->img($this->get('avatar'), $size);
+    }
 
-	/**
-	 * @return void
-	 */
-	protected function setProperties( WP_Post $post )
-	{
-		$defaults = [
-			'author' => __( 'Anonymous', 'site-reviews' ),
-			'date' => '',
-			'review_id' => '',
-			'review_type' => 'local',
-		];
-		$meta = array_filter(
-			array_map( 'array_shift', array_filter((array)get_post_meta( $post->ID ))),
-			'strlen'
-		);
-		$properties = glsr( CreateReviewDefaults::class )->restrict( array_merge( $defaults, $meta ));
-		$this->modified = $this->isModified( $properties );
-		array_walk( $properties, function( $value, $key ) {
-			if( !property_exists( $this, $key ) || isset( $this->$key ))return;
-			$this->$key = maybe_unserialize( $value );
-		});
-	}
+    /**
+     * @return ReviewHtml
+     */
+    public function build(array $args = [])
+    {
+        return new ReviewHtml($this, $args);
+    }
 
-	/**
-	 * @return void
-	 */
-	protected function setTermIds( WP_Post $post )
-	{
-		$this->term_ids = [];
-		if( !is_array( $terms = get_the_terms( $post, Application::TAXONOMY )))return;
-		foreach( $terms as $term ) {
-			$this->term_ids[] = $term->term_id;
-		}
-	}
+    /**
+     * @return Arguments
+     */
+    public function custom()
+    {
+        $custom = array_filter($this->meta()->toArray(), function ($key) {
+            return Str::startsWith('_custom', $key);
+        }, ARRAY_FILTER_USE_KEY);
+        $custom = Arr::unprefixKeys($custom, '_custom_');
+        $custom = Arr::unprefixKeys($custom, '_');
+        return glsr()->args($custom);
+    }
+
+    /**
+     * @return string
+     */
+    public function date($format = 'F j, Y')
+    {
+        return get_date_from_gmt($this->get('date'), $format);
+    }
+
+    /**
+     * @param int|\WP_Post $post
+     * @return bool
+     */
+    public static function isEditable($post)
+    {
+        $postId = Helper::getPostId($post);
+        return static::isReview($postId)
+            && in_array(glsr(Query::class)->review($postId)->type, ['', 'local']);
+    }
+
+    /**
+     * @param \WP_Post|int|false $post
+     * @return bool
+     */
+    public static function isReview($post)
+    {
+        return glsr()->post_type === get_post_type($post);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return !empty($this->id) && !empty($this->get('rating_id'));
+    }
+
+    /**
+     * @return Arguments
+     */
+    public function meta()
+    {
+        if (!$this->_meta instanceof Arguments) {
+            $meta = Arr::consolidate(get_post_meta($this->id));
+            $meta = array_map(function ($item) {
+                return array_shift($item);
+            }, array_filter($meta));
+            $meta = array_filter($meta, 'strlen');
+            $meta = array_map('maybe_unserialize', $meta);
+            $this->_meta = glsr()->args($meta);
+        }
+        return $this->_meta;
+    }
+
+    /**
+     * @param mixed $key
+     * @return bool
+     */
+    public function offsetExists($key)
+    {
+        return parent::offsetExists($key) || !is_null($this->custom()->$key);
+    }
+
+    /**
+     * @param mixed $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        $alternateKeys = [
+            'approved' => 'is_approved',
+            'has_revisions' => 'is_modified',
+            'modified' => 'is_modified',
+            'name' => 'author',
+            'pinned' => 'is_pinned',
+            'user_id' => 'author_id',
+        ];
+        if (array_key_exists($key, $alternateKeys)) {
+            return $this->offsetGet($alternateKeys[$key]);
+        }
+        if ('is_modified' === $key) {
+            return $this->hasRevisions();
+        }
+        if (is_null($value = parent::offsetGet($key))) {
+            return $this->custom()->$key;
+        }
+        return $value;
+    }
+
+    /**
+     * @param mixed $key
+     * @return void
+     */
+    public function offsetSet($key, $value)
+    {
+        // This class is read-only, except for custom fields
+        if ('custom' === $key) {
+            $value = Arr::consolidate($value);
+            $value = Arr::prefixKeys($value, '_custom_');
+            $meta = wp_parse_args($this->_meta->toArray(), $value);
+            $this->_meta = glsr()->args($meta);
+            parent::offsetSet($key, $this->custom());
+        }
+    }
+
+    /**
+     * @param mixed $key
+     * @return void
+     */
+    public function offsetUnset($key)
+    {
+        // This class is read-only
+    }
+
+    /**
+     * @return \WP_Post|null
+     */
+    public function post()
+    {
+        if (!$this->_post instanceof \WP_Post) {
+            $this->_post = get_post($this->id);
+        }
+        return $this->_post;
+    }
+
+    /**
+     * @return void
+     */
+    public function render()
+    {
+        echo $this->build();
+    }
+
+    /**
+     * @return string
+     */
+    public function rating()
+    {
+        return glsr_star_rating($this->get('rating'));
+    }
+
+    /**
+     * @return string
+     */
+    public function type()
+    {
+        $type = $this->get('type');
+        $reviewTypes = glsr()->retrieveAs('array', 'review_types');
+        return Arr::get($reviewTypes, $type, _x('Unknown', 'admin-text', 'site-reviews'));
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasRevisions()
+    {
+        if (!$this->has_checked_revisions) {
+            $modified = glsr(Query::class)->hasRevisions($this->ID);
+            $this->set('is_modified', $modified);
+            $this->has_checked_revisions = true;
+        }
+        return $this->get('is_modified');
+    }
 }

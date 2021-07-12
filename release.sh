@@ -1,14 +1,14 @@
 #!/bin/sh
 # By Paul Ryley, based on work by Mike Jolley
 # License: GPLv3
-# Version: 1.1.0
+# Version: 1.2.0
 
 # ----- START EDITING HERE -----
 
 ASSETS_DIR="+/screenshots"
 GIT_BRANCH="master"
-MIN_PHP_VERSION="5.6"
-MIN_WORDPRESS_VERSION="4.7"
+MIN_PHP_VERSION="5.6.20"
+MIN_WORDPRESS_VERSION="5.5"
 PLUGIN_SLUG="site-reviews"
 
 # ----- STOP EDITING HERE -----
@@ -43,10 +43,12 @@ fi
 
 echo ""
 read -p " - Updated the changelog for "${PLUGIN_VERSION}" and appended it to readme.txt?"
-read -p " - Verified compatibility with PHP v${MIN_PHP_VERSION} -> latest?"
-read -p " - Verified compatibility with Wordpress v${MIN_WORDPRESS_VERSION} -> latest?"
 read -p " - Updated the POT file?"
 read -p " - Updated the screenshots?"
+read -p " - Updated the What's New page for major/minor version updates?"
+read -p " - Verified compatibility with PHP v${MIN_PHP_VERSION} -> latest?"
+read -p " - Verified compatibility with Wordpress v${MIN_WORDPRESS_VERSION} -> latest?"
+read -p " - Verified the changelog release date?"
 read -p " - Committed all changes to the master branch on GITHUB?"
 read -p " - Scrutinizer has passed all inspections?"
 echo ""

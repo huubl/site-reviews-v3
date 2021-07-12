@@ -1,11 +1,11 @@
 === Site Reviews ===
 Contributors: geminilabs, pryley
 Donate link: https://www.paypal.me/pryley
-Tags: reviews, ratings, business ratings, business reviews, testimonials, site reviews, star rating, wp rating, wp review, wp testimonials
-Requires at least: 4.7.0
-Tested up to: 5.1
+Tags: reviews, ratings, testimonials, woocommerce, product reviews
+Tested up to: 5.7
+Requires at least: 5.5
 Requires PHP: 5.6
-Stable tag: 3.5.4
+Stable tag: 5.12.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,269 +13,467 @@ Site Reviews allows you to easily receive and display reviews for your website, 
 
 == Description ==
 
-> Site Reviews requires PHP v5.6 or higher!
+Site Reviews allows your visitors to submit reviews with a 1-5 star rating on your website, similar to the way you would on TripAdvisor or Yelp. The plugin provides blocks, shortcodes, and widgets, along with full documentation.
 
-Site Reviews allows your visitors to submit reviews with a 1-5 star rating on your website, similar to the way you would on TripAdvisor or Yelp.
+You can pin your best reviews so that they are always shown first, require approval before new review submissions are published, require visitors to be logged-in in order to write a review, send custom notifications on a new submission, and a whole lot more!
 
-The plugin provides blocks, shortcodes, and widgets, along with full documentation.
-
-You can pin your best reviews so that they are always shown first, require approval before new review submissions are published, require visitors to be logged-in in order to write a review, send custom notifications on a new submission, and much more.
+__Site Reviews provides full Woocommerce integration__ with the free [Woocommerce Reviews](https://niftyplugins.com/plugins/woocommerce-reviews/) add-on.
 
 [Follow plugin development on Github.](https://github.com/pryley/site-reviews/)
 
-= Current Features =
+### Current Features
 
-- Actively developed and supported
-- Ajax pagination of reviews
-- Akismet integration for spam-validation
-- Asian language support
-- Assign reviews to a Post/Page ID
-- Backup and restore plugin settings
-- Bayesian ranking for posts with assigned reviews (can be used for WP_Query sorting)
-- Block Editor support with custom configurable blocks
-- Clean and easy-to-configure interface
-- Complete documentation
-- Configurable Widgets
-- Custom notifications (including Slack support)
-- Easy setup and implementation
-- Honeypot (spam trap) implemented in the submission form
-- Plugin styles to match popular themes, form plugins, and CSS frameworks
-- Polylang integration for multilingual websites
-- Rating Snippets in Google search results (schema.org JSON-LD markup)
-- Relative dates
-- Review avatars (gravatar.com)
-- Review blacklist
-- Review categories
-- Review responses
-- Reviews summary
-- Shortcode button dropdown in the Classic Editor
-- Shortcodes: display reviews in your post content and templates
-- Templates
-- Translate any plugin text
-- Use Google's Invisible reCAPTCHA on submission forms
-- WordPress.org support
+- __Actively Developed and Supported__
+- __Asian Language Support__
+- __Assign Reviews to Categories__: Add your own categories and assign reviews to them.
+- __Assign Reviews to Pages__: Assign reviews to Posts, Pages, and Custom Post Types like Woocommerce Products.
+- __Assign Reviews to Users__: Assign reviews to Users on your website.
+- __Avatars__: Provided by the WordPress Gravatar service
+- __Backup and Restore__: Export/Import your settings and custom translations, and use the WordPress Export and Import tools to backup your reviews.
+- __Bayesian Ranking__: Easily sort pages with assigned reviews by rank (using the bayesian algorithm) in your custom WP_Query
+- __Blacklist__: Block review submissions which contain specific words, phrases, IP addresses, names, and emails
+- __Developer Friendly__: Designed for WordPress developers with over 100 hooks and convenient functions
+- __Documentation__: FAQ and documenation for hooks and all shortcodes and functions
+- __Editor Blocks__: Use the custom editor blocks in the Gutenberg editor
+- __Elementor Support__: Use the native Elementor Widgets in the Elementor editor
+- __Form Styles__: Match the review form with popular themes and form plugins
+- __Import Third-Party Reviews__: Includes a built-in CSV importer
+- __JSON-LD Schema__: Display your reviews and ratings in search results
+- __Members Only__: Require users to be logged in before submitting a review
+- __Multilingual__: Integrates with Polylang and WPML
+- __Multisite Support__: Fully supports network/multisite websites
+- __Notifications__: Send notifications to one or more emails when a review is submitted
+- __Pagination__: Display a set number of reviews per-page with AJAX
+- __Premium Support__: Free premium-level support included on the WordPress.org support forum
+- __Privacy__: Integrates with the WordPress privacy tools
+- __Rating Summaries__: Display a summary of your review ratings from high to low.
+- __Relative Dates__: You decide the date format that is displayed in your reviews
+- __Responses__: Write responses to your reviews
+- __REST API__: Access your reviews from remote websites and applications using the API.
+- __Restrictions__: Require approval before publishing reviews and limit review submissions by email address, IP address, or username
+- __Shortcodes__: Configurable shortcodes complete with full documentation
+- __Slack Integration__: Receive notifications in Slack when a review is submitted
+- __SPAM Protection__: Includes 5 layers of protection from spam! Built-in Honeypot protection; Invisible reCAPTCHA, Akismet, Blacklist, and Review limits
+- __Templates__: Use the Site Reviews templates in your theme for full control over the HTML
+- __Translations__: Easily change any text of the plugin to your own
+- __Widgets__: Use the configurable widgets in your sidebars.
+
+### Site Reviews Add-ons
+
+Site Reviews provides a ton of absolutely free features, possibly more than any other review plugin! But when those features are not enough, Site Reviews provides additional features through add-ons. Current add-ons include:
+
+- __[Review Forms](https://niftyplugins.com/plugins/site-reviews-forms/) (premium)__: Create custom review forms with over 20 field types and individual review templates.
+- __[Review Filters](https://niftyplugins.com/plugins/site-reviews-filters/) (premium)__: Sort, filter, and search your reviews.
+- __[Review Images](https://niftyplugins.com/plugins/site-reviews-images/) (premium)__: Add images with captions to your reviews.
+- __[Trustalyze Confidence System](https://niftyplugins.com/plugins/trustalyze/) (free)__: Integrate with the Trustalyze Confidence System and post reviews on the blockchain.
+- __[Woocommerce Reviews](https://niftyplugins.com/plugins/woocommerce-reviews/) (free)__: Integrate Site Reviews with your Woocommerce products.
+
+### Site Reviews Premium
+
+[Site Reviews Premium](https://niftyplugins.com/plugins/site-reviews-premium/) provides access to all of our free and premium add-ons, and automatically includes access to future add-ons as they are released.
+
+### Attribution
+
+Images adapted from [freepik](https://www.freepik.com).
 
 == Installation ==
 
 = Minimum plugin requirements =
 
-If your server and website does not meet the minimum requirements shown below, the plugin will automatically deactivate and a notice will appear explaining why.
+- WordPress 5.5.0
+- PHP 5.6.20
 
-- WordPress 4.7.0
-- PHP 5.6
+If your server and website does not meet the minimum requirements shown below, the plugin will automatically deactivate and a notice will appear explaining why.
 
 = Automatic installation =
 
-Log in to your WordPress dashboard, navigate to the Plugins menu and click "Add New".
-
-In the search field type "Site Reviews" and click Search Plugins. Once you have found the plugin you can view details about it such as the point release, rating and description. You can install it by simply clicking "Install Now".
+Log in to your WordPress dashboard, navigate to the Plugins menu and click "Add New". In the search field type "Site Reviews" and click Search Plugins. Once you have found the plugin, click "Install Now".
 
 = Manual installation =
 
-Download the Site Reviews plugin and uploading it to your server via your favorite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+Download the Site Reviews plugin and upload it to your server with your favorite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
 
 == Frequently Asked Questions ==
 
 = How do I use Site Reviews? =
-Use the provided shortcodes, widgets, and blocks on your website. Make sure to view the screenshots above and read the Documentation page included in the plugin menu (once installed).
+Use the provided shortcodes, widgets, and blocks on your website. Please also see the screenshots above which demontrate many of the features, and read the Help page included in the Site Reviews menu once the plugin has been installed and activated.
 
 = I need help with something else =
-All documentation can be found in the "Documentation" page of the plugin. If your question is not answered there, please create a new topic in the [WordPress support forum](https://wordpress.org/support/plugin/site-reviews/).
+All documentation can be found in the "Help" page of the plugin. If your question is not answered there, please create a new topic in the [WordPress support forum](https://wordpress.org/support/plugin/site-reviews/).
 
-== Screenshots ==
+## Screenshots
 
-1. A view of the All Reviews page
+1. The "All Reviews" page.
 
-2. A view of the Edit Review page
+2. Add-ons provide additional functionality to Site Reviews
 
-3. A view of the Site Reviews &gt; Settings page
+3. The "Edit Review" page.
 
-4. A view of the Site Reviews &gt; Tools page where you can export/import the plugin settings
+4. Site Reviews has full support for the new Blocks Editor and includes custom blocks for each of the shortcodes.
 
-5. Site Reviews provides extensive documentation with the plugin
+5. If you are still using the Classic page editor, you can use the Site Reviews  dropdown button to easily add any of the shortcodes.
 
-6. Site Reviews supports the Block Editor and includes blocks for each of the shortcodes
+6. Site Reviews includes three widgets.
 
-7. Site Reviews adds a dropdown in the Classic Editor to easily add any of the shortcodes
+7. Site Reviews includes a Help page with answers to frequently asked questions and complete documentation for all available shortcode options.
 
-8. A view of the Site Reviews widgets
+8. The "General" settings page.
 
-9. This is what the Slack notifications look like
+9. The "Reviews" settings page.
 
-== Changelog ==
+10. The "Submissions" settings page.
 
-= 3.5.4 (2019-03-29) =
+11. The "Schema" settings page.
 
-- Fixed compatibility with Woocommerce when using the "Product" schema type
+12. Easily add a custom translation for any text in the plugin.
 
-= 3.5.3 (2019-03-27) =
+13. Export/import the plugin settings, and perform various other tasks.
 
-- Fixed activation check for PHP versions < 5.4
-- Fixed possible error when submitting a review where the submission response is never shown
+14. If you experience any issues with the plugin, the console logger is the first pace to look.
 
-= 3.5.2 (2019-03-06) =
+15. View information about the configuration of your server, your website, and the Site Reviews plugin.
 
-- Changed supported WP version to 5.1
-- Fixed possible compatibility issues with other plugins
-- Removed ABSPATH from log entries
+16. This is what the Slack notifications look like.
 
-= 3.5.1 (2019-03-04) =
+## Changelog
 
-- Fixed line-breaks in reviews when the "Enable Excerpts" option is disabled
+= 5.12.8 (2021-07-12) =
 
-= 3.5.0 (2019-02-21) =
+- Fixed PHP warning introduced in v5.12.7
 
-- Added a "fallback" option to the [site_reviews] shortcode (see documentation)
-- Added an "Enable Fallback Text" option in the plugin settings that can be shown by default when there are no reviews to display
-- Added informational text to the Site Reviews blocks when all fields are hidden
-- Fixed the "Assigned To" metabox search dropdown
+= 5.12.7 (2021-07-12) =
 
-= 3.4.0 (2019-02-18) =
+- Improved the error message when saving add-on licenses to make it more descriptive and helpful.
+- Removed the "Discover Premium" button for licensed add-on users
 
-- Added ability to assign reviews using "parent_id"
+= 5.12.6 (2021-07-07) =
 
-= 3.3.1 (2019-02-17) =
+- Fixed invalid schema output on the [site_reviews] shortcode when there are no reviews
+- Fixed the Assigned Posts filter on the All Reviews page
 
-- Fixed bug (introduced in v3.2.6) with submitted reviews incorrectly handling GMT timezones
+= 5.12.5 (2021-07-01) =
 
-= 3.3.0 (2019-02-14) =
+- Fixed the plugin migration which sets the custom role capabilities in cases where the default WordPress roles have been renamed or removed
 
-- Added "glsr_star_rating" helper function (see documentation)
+= 5.12.4 (2021-07-01) =
 
-= 3.2.6 (2019-02-13) =
+- Fixed the filters on the "All Reviews" admin page
 
-- Fixed review date from changing when approved
+= 5.12.3 (2021-07-01) =
 
-= 3.2.5 (2019-02-11) =
+- Added a `data-rating` attribute to the review ratings
 
-- Fixed sort-by-author in reviews table
+= 5.12.2 (2021-06-12) =
 
-= 3.2.4 (2019-02-10) =
+- Fixed the Bulk Edit actions
 
-- Fixed category assignment
+= 5.12.1 (2021-06-12) =
 
-= 3.2.3 (2019-02-08) =
+- Fixed the "respond_to_*" capabilities, users can now respond to reviews if they are the author of one of the assigned posts
 
-- Fixed conflict with comment moderation
+= 5.12.0 (2021-06-07) =
 
-= 3.2.2 (2019-02-07) =
+- Added the "rating_field" shortcode option which allows you to use a custom rating field with the summary
+- Added the "Repair Review Relations" tool
+- Fixed "loose assignment" database queries
 
-- Fixed potential issue with star-ratings
+= 5.11.1 (2021-06-03) =
 
-= 3.2.1 (2019-02-05) =
+- Fixed pagination
 
-- Added "site-reviews/review/redirect" hook
-- Fixed documentation
+= 5.11.0 (2021-06-02) =
 
-= 3.2.0 (2019-01-26) =
+- Added a REST API (see the provided documentation to learn how to use it)
+- Added custom capabilities for responding to reviews (`respond_to_site-review` and `respond_to_others_site-review`)
+- Added filters for categories, assigned posts, and assigned users on the "All Reviews" admin page (enable them in the "Screen Options" on the top-right of the page)
+- Added native Elementor widgets
+- Added support for <optgroup> in dropdown fields (this may be useful when using the Review Forms add-on to display a category dropdown with parent/child categories). To learn how to enable this, please see the FAQ Help page.
+- Added the `glsr_update_review` helper function (see the provided documentation to learn how to use it)
+- Added the ability to create reviews from the admin
+- Added the ability to respond to reviews from the "All Reviews" page
+- Added the `site-reviews/review/build/tag/response/by` hook (see the FAQ to learn how to use it to change the name in the response)
+- Fixed inline styles (overriding the star images should now display correctly in the block editor)
+- Fixed summary review counts for 0-star ratings
+- Fixed the star rating when resetting the submission form where a default rating is set
 
-- Added the ability to render reviews that are fetched with the helper functions (see documentation)
-- Fixed a potential PHP error due to plugins or themes incorrectly using [apply_filter](http://developer.wordpress.org/reference/functions/add_filter/)
+= 5.10.4 (2021-05-03) =
+
+- Fixed date validation in the "Import Third Party Reviews" tool
+
+= 5.10.3 (2021-04-28) =
+
+- Fixed the assigned_posts meta keys which store the average rating, ranking, and review count
+
+= 5.10.2 (2021-04-27) =
+
+- Fixed the missing "terms" database column error for users who have not run the plugin migration from previous versions
+
+= 5.10.1 (2021-04-26) =
+
+- Fixed the missing "terms" database column error for users who updated a fresh install of Site Reviews v5.9 to v5.10
+
+= 5.10.0 (2021-04-26) =
+
+- Added delimiter and date format options in the "Import third party reviews" tool
+- Fixed the missing "terms" database column in a fresh install of Site Reviews
+
+= 5.9.0 (2021-04-24) =
+
+- Added a "Compatibility Issues" section to the Help page to document incompatible plugins along with possible workarounds.
+- Added a "terms" option to the shortcodes which allow you to only display reviews where the terms field was accepted in the form. All reviews that were submitted before this update will have their terms set as accepted.
+- Fixed database foreign table constraints
+- Fixed settings tabs on touch devices
+- Improved the Tools page
+
+= 5.8.5 (2021-04-17) =
+
+- Fixed anonymous reviews from inheriting the author ID of the logged in user after being edited
+
+= 5.8.4 (2021-04-15) =
+
+- Fixed a potential problem introduced by the previous widget compatibility fix
+
+= 5.8.3 (2021-04-12) =
+
+- Fixed widget compatibility with page builder plugins
+
+= 5.8.2 (2021-04-03) =
+
+- Fixed javascript event system
+- Fixed the FAQ javascript example of hiding the form after a review submission
+
+= 5.8.1 (2021-03-28) =
+
+- Fixed database versioning
+- Fixed internal unique array logic
+
+= 5.8.0 (2021-03-05) =
+
+- Added setting tooltips
+- Fixed compatibility with the Thrive Architect plugin
+- Fixed compatibility with the WP Rocket plugin
+- Fixed modal styles
+- Optimised settings
 - Updated documentation
 
-= 3.1.11 (2019-01-24) =
+= 5.7.4 (2021-03-02) =
 
-- Changed "submit-button.php" templates for all plugin styles
-- Fixed issue with cloudflare IP detection
+- Fixed review star CSS
 
-= 3.1.10 (2019-01-22) =
+= 5.7.3 (2021-02-24) =
 
-- Fixed plugin styles
-- Fixed potential issue with AJAX requests
+- Fixed compatibility with Elementor Pro popups
+- Fixed compatibility with SG Optimiser
+- Fixed compatibility with WPForms
+- Fixed the toggle alignment in the "Minimal" plugin style
+- Fixed validation event listeners
 
-= 3.1.9 (2019-01-21) =
+= 5.7.2 (2021-02-18) =
 
-- Changed "submit-button.php" template
-- Fixed button style
-- Fixed documentation for "glsr_create_review" helper function
-- Fixed potential PHP error
-- Removed "No Title" fallback in "/wp-admin" for reviews with no title (WordPress handles this)
+- Fixed support for PHP compiled without a built-in ctype extension (i.e. FreeBSD servers)
 
-= 3.1.8 (2019-01-17) =
+= 5.7.0 (2021-02-16) =
 
-- Changed Translations to allow <span> tags
-- Fixed isolation for Block CSS styles
-- Fixed potential javascript error with pagination
+- Added a custom Event Emitter which will allow you to manually initialise the Site Reviews javascript after the DOMContentLoaded event has fired or from Popup events (see: [EVENTS.md](https://github.com/pryley/site-reviews/blob/master/EVENTS.md).
+- Added documentation on troubleshooting problems with the review form (see the "Common Problems and Solutions" section on the Help page).
+- Added the "Optimise Your Database Tables" tool which allows you to convert tables from MyISAM to InnoDB for better performance.
+- Improved the excerpt and pagination scripts.
 
-= 3.1.7 (2019-01-14) =
+= 5.6.2 (2021-02-09) =
 
-- Fixed Akismet integration
-- Fixed Blacklist IP validation
-- Fixed a potential [modsecurity false positive](https://github.com/client9/libinjection/issues/145)
+- Added the "Review Themes" add-on, premium members may request early access to try out the beta.
+- Fixed the FAQ for hiding the form after submission.
 
-= 3.1.5 (2019-01-08) =
+= 5.6.1 (2021-02-05) =
 
-- Fixed custom templating
+- Fixed the star rating field on touch devices
 
-= 3.1.4 (2019-01-07) =
+= 5.6.0 (2021-02-04) =
 
-- Changed plugin shortcodes to allow add-on integration
-- Fixed a possible javascript conflict that breaks form validation
-- Fixed error when "Slack webhook URL" setting is empty
-- Fixed multi-checkbox values in plugin settings
-- Fixed possible duplicate star-rating controls
-- Fixed rating counts for review categories
-- Removed internal "site-reviews/shortcode/hidden-keys" hook
+- Added an option to display excerpted reviews in a modal
+- Fixed assigned ranking meta when reviews are manually approved/unapproved
+- Fixed imported reviews losing their submission date when approved/unapproved
+- Fixed incorrect triggering of the rating validation after a form submission
+- Fixed translation bug with htmlentities
+- Fixed paragraph word wrapping in reviews
 
-= 3.1.2 (2019-01-03) =
+= 5.5.2 (2021-01-29) =
 
-- Fixed compatibility issue with PHP v7.0.x
+- Fixed browser support for star-ratings.js
 
-= 3.1.1 (2019-01-01) =
+= 5.5.1 (2021-01-26) =
 
-- Fixed support for Microsoft IIS
+- Added the missing "What's New" sections
 
-= 3.1.0 (2018-12-30) =
+= 5.5.0 (2021-01-26) =
 
-- Added compatibility for WP Super Cache plugin
-- Added helper function to recalculate ratings
-- Added safe method of using plugin functions without having to use `function_exists()` (see documentation)
-- Added support for multiple shortcode buttons on the same page (i.e. when using multiple classic wysiwyg editors)
-- Changed "minimum rating" range in the block options to allow a rating of "0" (to show reviews with no rating)
-- Fixed summary counts when the "Require Approval" option is enabled
-- Fixed the "All Reviews" page to update the status counts when a review is approved/unapproved
-- Fixed the "Recalculate rating counts" notice
+- Added "data-field" attribute to form fields; this should make it easier to build custom CSS layouts
+- Added "date", "user__in", and "user__not_in" parameters to the glsr_get_reviews() function
+- Added glsr_trace() helper function
+- Added plugin style for the "Twenty Twenty-One" theme
+- Added "Restrict Limits To" setting which allows you to choose which assignments are used in the review limits.
+- Added sub-sections for add-on settings
+- Changed the "site-reviews/review/build/<tag>" hooks to "site-reviews/review/build/tag/<tag>"
+- Fixed CSV importing when header values contain trailing spaces
+- Fixed email and IP address review limits to include all reviews (not just approved reviews)
+- Upgraded star-ratings.js library to v4 in preparation for the "Review Themes" add-on
 
-= 3.0.5 (2018-12-26) =
+= 5.4.3 (2021-01-16) =
 
-- Fixed compatibility with Woocommerce plugin
-- Fixed tinymce button, it should only appear on the primary page editor (classic editor)
-- Fixed WP pointer dismissal
+- Fixed Add-on support notice
+- Fixed Migration support for PHP 8.0 Named Arguments
 
-= 3.0.4 (2018-12-22) =
+= 5.4.2 (2020-12-26) =
 
-- Fixed detection of PHP support for IPv6
-- Fixed form submissions
+- Fixed line breaks in excerpts
 
-= 3.0.3 (2018-12-21) =
+= 5.4.1 (2020-12-24) =
 
-- Fixed PHP error preventing plugin activation when the PHP multibyte extension is not installed
+- Fixed links in review responses to allow the "rel" attribute
+- Happy Holidays! 🎄✨🍾
 
-= 3.0.2 (2018-12-21) =
+= 5.4.0 (2020-12-22) =
 
-- Fixed PHP warning when calculating review counts due to reviews not having their review_type set correctly (possible due to incorrectly importing 3rd-party reviews)
+- Added the "schema_identifier" meta key which can be used to set a custom '@id' schema property with the Custom Fields metabox
+- Added the "Woocommerce Reviews" add-on
+- Fixed a PHP 8 error with the schema
+- Fixed setting fields to use escaped HTML attributes
 
-= 3.0.1 (2018-12-21) =
+= 5.3.5 (2020-12-16) =
 
-- Fixed "Contact Form 7" style
-- Fixed category option in shortcodes
-- Updated FAQ
+- Fixed template tag substitution in custom review templates
 
-= 3.0.0 (2018-12-20) =
+= 5.3.4 (2020-12-16) =
 
-- !! Complete rewrite of Site Reviews
-- !! Dropped support for legacy web browsers (supports all modern browsers and IE11+)
-- !! Dropped support for the twentyten to twentyfourteen themes
-- !! Requires PHP 5.6 or greater and WordPress 4.7 or greater
-- Added additional avatar options
-- Added Asian language support in excerpt lengths
-- Added configurable WordPress 5.0 blocks for the new Block Editor
-- Added export/import plugin tools
-- Added form styles to match popular themes and form plugins
-- Added multiple notification support
-- Added plugin templates for easy cutomisation of the shortcode and widget HTML
-- Added Polylang support for multilingual websites
-- Fixed star-rating compatibility with Woocommerce themes
+- Fixed pagination to use the saved "hide" options
+- Fixed the import tool, it no longer substitutes empty review name/email fields with those of the logged in user
+
+= 5.3.3 (2020-12-14) =
+
+- Fixed add-on updater
+
+= 5.3.2 (2020-12-13) =
+
+- Added "Site Reviews Premium"
+- Added "Review Forms" add-on
+- Added debug logging for validation errors
+- Added error logging for database table creation errors
+- Added support for PHP 8
+- Added the Category and Review IDs to the action row in the admin tables
+- Added the {{ assigned_posts }}, {{ assigned_users }}, and {{ assigned_terms }} template tags
+- Fixed block attributes
+- Fixed line-breaks in review excerpts
+- Fixed pagination URLs for servers that do not use REQUEST_URI
+- Fixed support for older custom fields using assign_to/category as names
+- Fixed the Backtrace used when logging entries to the Console
+- Fixed the Console on sites that have been duplicated but still have the upload dir cached to the old path
+- Improved the block options
+- Improved the documentation
+- Improved the System Info
+
+= 5.2.3 (2020-11-30) =
+
+- Fixed the PHP multibyte fallback when the iconv extension is missing
+
+= 5.2.2 (2020-11-17) =
+
+- Fixed shortcode examples in documentation; Copy/pasting a shortcode example into the classic editor will now paste as plain text instead of as HTML code.
+- Fixed System Info details to always be in English
+
+= 5.2.1 (2020-11-15) =
+
+- Fixed MariaDB support (removed subqueries from the SQL)
+- Fixed migration of imported settings
+- Fixed the "post__in" and "post__not_in" options of the glsr_get_reviews() helper function
+
+= 5.2.0 (2020-11-06) =
+
+- Added Notification Template tags for assigned categories, posts, and users
+- Added Review Assignment setting
+- Changed review assignment in SQL queries to use strict assignments by default (it was previously using loose assignments, use the new "Review Assignment" setting to change this back)
+- Changed the glsr_create_review function to log validation errors to the plugin console
+- Fixed Bulk Editing of reviews that are assigned to post types or users
+- Fixed Multibyte String support
+- Fixed Multisite compatibility
+- Fixed pagination URLs when used on the homepage
+- Fixed rating validation when using a custom maximum rating value
+- Fixed review limits validation for assigned reviews
+- Fixed review migration of invalid 3rd-party reviews (reviews that were previously imported incorrectly)
+- Fixed review name and email fallback values to use those of the logged-in user
+- Fixed the submission date of reviews, it now uses the timezone offset in the WordPress settings
+
+= 5.1.6 (2020-10-25) =
+
+- Fixed compatibility issue with the Elementor Pro Popups
+- Fixed the glsr_create_review helper function validation
+
+= 5.1.4 (2020-10-25) =
+
+- Fixed addons notice styling and placement
+- Fixed plugin file paths on IIS Windows servers
+- Fixed plugin migrations to work better with the W3 Total Cache plugin
+- Fixed strict standard notices in PHP 5.6
+
+= 5.1.0 (2020-10-24) =
+
+- Fixed database integration with WordPress tables that still use the old MyISAM engine
+- Fixed the submission date of reviews to account for the timezone
+- Improved the plugin migration notice
+
+= 5.0.3 (2020-10-23) =
+
+- Added back the deprecated "count" option on the [site_reviews] shortcode so that it will still work for people who have not yet replaced it with the "display" option.
+- Fixed a regression which prevented translations from including a link (i.e. the terms toggle)
+- Fixed the terms toggle validation
+- Fixed the trustalyze add-on link
+
+= 5.0.0 (2020-10-22) =
+
+- Added "Delete data on uninstall" option to selectively delete plugin data when removing the plugin
+- Added "Send Emails From" option to send notifications from a custom email address
+- Added a loading="lazy" attribute to avatar images
+- Added a new Review Details metabox which allows you to modify review values
+- Added a tool to import 3rd-party reviews
+- Added a tool to test IP address detection
+- Added assigned_posts shortcode option, this replaces the "assign_to" and "assigned_to" options and allows you to assign reviews to multiple Post IDs
+- Added assigned_terms shortcode option, this replaces the "category" option and allows you to assign reviews to multiple Categories
+- Added assigned_users shortcode option, this allows you to assign reviews to multiple User IDs
+- Added [suggested privacy policy content](https://wordpress.org/support/article/wordpress-privacy/#privacy-policy-editing-helper)
+- Added the submitted review to the "site-reviews/after/submission" javascript event
+- Added [WordPress Personal Data Eraser](https://wordpress.org/support/article/wordpress-privacy/#erase-personal-data-tool) integration
+- Added [WordPress Personal Data Exporter](https://wordpress.org/support/article/wordpress-privacy/#export-personal-data-tool) integration
+- Added [WordPress Revision](https://wordpress.org/support/article/revisions/) integration
+- Changed the assigned_to hide option to assigned_links (i.e. [site_reviews hide="assigned_links"])
+- Changed the minimum PHP version to 5.6.20
+- Changed the minimum WordPress version to 5.5
+- Changed the review limit validation to perform strict checking for assigned posts, categories and users (AND instead of OR)
+- Changed the settings to use the WordPress "Disallowed Comment Keys" option by default
+- Changed the "site-reviews/rating/average" filter hook argument order (see the Upgrade Guide on the Site Reviews welcome page)
+- Fixed compatibility with the Divi theme and Divi Builder plugin
+- Fixed compatibility with the Elementor Pro plugin popups
+- Fixed compatibility with the GeneratePress Premium plugin
+- Fixed compatibility with the Hummingbird Performance plugin
+- Fixed compatibility with the Members plugin
+- Fixed compatibility with the WP-Optimize plugin
+- Fixed compatibility with the WP Super Cache plugin
+- Fixed the review summary bars in IE11
+- Fixed Welcome page permissions
+- Improved console logging
 - Improved documentation
-- Improved performance, especially for sites with thousands of reviews
-- Improved reCAPTCHA compatibility with other plugins
+- Improved plugin performance with thousands of reviews
+- Improved the blocks to visually match the WordPress 5.5 editor style
+- Improved the Terms checkbox in the review form to align correctly with the text
+- Improved translation settings
+- Refreshed the stars SVG images
+- Removed the deprecated "count" option from the [site_reviews] ahortcode (use the "display" option instead).
+- Removed the "site-reviews/config/forms/submission-form" filter hook (see the Upgrade Guide on the Welcome page)
+- Removed the "site-reviews/reviews/reviews-wrapper" filter hook (see the Upgrade Guide on the Welcome page)
+- Removed the "site-reviews/submission-form/order" filter hook (see the Upgrade Guide on the Welcome page)
+- Removed the glsr_calculate_ratings() helper function
+- Removed the Trustalyze integration, it is now an add-on
+- Removed tool to calculate rating counts (no longer needed)
+- Renamed the glsr_get_rating() helper function to glsr_get_ratings()
+- Replaced the assign_to and assigned_to shortcode options with the assigned_posts option
+- Replaced the category shortcode option with "assigned_terms" option
+- Site Reviews now uses custom database tables, however you may still use the WordPress Export/Import tools as before
+- The Translations Settings search results are now restricted to public text that is actually shown on your website, if you would like to change plugin text shown in the WordPress admin, you should use the Loco Translate plugin instead

@@ -2,37 +2,40 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Html\Fields;
 
-use GeminiLabs\SiteReviews\Modules\Html\Fields\Field;
+use GeminiLabs\SiteReviews\Helpers\Arr;
 
 class Code extends Field
 {
-	/**
-	 * @return string|void
-	 */
-	public function build()
-	{
-		$this->builder->tag = 'textarea';
-		$this->mergeFieldArgs();
-		return $this->builder->getTag();
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function defaults($fieldLocation = null)
+    {
+        $classes = [
+            'metabox' => '',
+            'setting' => 'large-text code',
+            'widget' => '',
+        ];
+        return [
+            'class' => Arr::get($classes, $fieldLocation),
+        ];
+    }
 
-	/**
-	 * @return array
-	 */
-	public static function defaults()
-	{
-		return [
-			'class' => 'large-text code',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function required($fieldLocation = null)
+    {
+        return [
+            'type' => 'textarea',
+        ];
+    }
 
-	/**
-	 * @return array
-	 */
-	public static function required()
-	{
-		return [
-			'type' => 'textarea',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function tag()
+    {
+        return 'textarea';
+    }
 }

@@ -1,16 +1,15 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<?php foreach( $addons as $title => $section ) : ?>
+<?php foreach ($addons as $title => $section) : ?>
 <div class="glsr-card postbox">
-	<div class="glsr-card-header">
-		<h3><?= $title; ?></h3>
-		<button type="button" class="handlediv" aria-expanded="true">
-			<span class="screen-reader-text"><?= __( 'Toggle documentation panel', 'site-reviews' ); ?></span>
-			<span class="toggle-indicator" aria-hidden="true"></span>
-		</button>
-	</div>
-	<div class="inside">
-		<?= $section; ?>
-	</div>
+    <h3 class="glsr-card-heading">
+        <button type="button" class="glsr-accordion-trigger" aria-expanded="false" aria-controls="">
+            <span class="title"><?= $title; ?></span>
+            <span class="icon"></span>
+        </button>
+    </h3>
+    <div class="inside">
+        <?= $section; ?>
+    </div>
 </div>
 <?php endforeach; ?>

@@ -1,13 +1,16 @@
 .*
+!.babelrc
 !.gitattributes
 !.gitignore
 !.jshintrc
 !.scrutinizer.yml
 !.travis.yml
+*.js.LICENSE.txt
 *.log
 *.map
 coverage.xml
+mix-manifest.json
 
-/_
 /node_modules
 /vendor
+assets/scripts/site-reviews-blocks.js.LICENSE.txt

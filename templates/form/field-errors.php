@@ -1,5 +1,3 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<span class="glsr-field-error">
-	{{ errors }}
-</span>
+<div class="{{ class }}">{{ errors }}</div>

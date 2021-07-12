@@ -1,7 +1,9 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
+
+<h2 class="title"><?= _x('Review Form Settings', 'admin-text', 'site-reviews'); ?></h2>
 
 <table class="form-table">
-	<tbody>
-		{{ rows }}
-	</tbody>
+    <tbody>
+        {{ rows }}
+    </tbody>
 </table>

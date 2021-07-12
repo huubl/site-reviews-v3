@@ -1,5 +1,5 @@
-<?php defined( 'WPINC' ) || die; ?>
+<?php defined('ABSPATH') || die; ?>
 
-<div class="glsr-form-message {{ class }}">
-	{{ message }}
+<div class="{{ class }}">
+    <p>{{ message }}</p>
 </div>
